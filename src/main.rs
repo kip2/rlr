@@ -188,12 +188,16 @@ mod tests {
         </p>
         "#;
 
-        let result1 = pickup_test_case(&html)[0].clone();
-        let result2 = pickup_test_case(&html)[1].clone();
-        let result3 = pickup_test_case(&html)[2].clone();
+        let expecteds = vec![
+            "getLowestTemperature(3,2) --> 1",
+            "getLowestTemperature(2,10) --> -8",
+            "getLowestTemperature(18,5) --> 13",
+        ];
 
-        assert_eq!(result1, "getLowestTemperature(3,2) --> 1");
-        assert_eq!(result2, "getLowestTemperature(2,10) --> -8");
-        assert_eq!(result3, "getLowestTemperature(18,5) --> 13");
+        let results = pickup_test_case(html);
+
+        for (i, actual) in results.iter().enumerate() {
+            assert_eq!(actual, expecteds[i]);
+        }
     }
 }
