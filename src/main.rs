@@ -73,7 +73,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_output_test_cases() {
+    fn test_get_output_test_cases() {
         let html = r#"
         <p class="m-0 rem0p8">
             getLowestTemperature(3,2) --> 1
@@ -108,7 +108,7 @@ mod tests {
     }
 
     #[test]
-    fn test_input_test_cases() {
+    fn test_get_input_test_cases() {
         let html = r#"
         <p class="m-0 rem0p8">
             getLowestTemperature(3,2) --> 1
