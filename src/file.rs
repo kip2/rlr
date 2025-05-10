@@ -8,10 +8,10 @@ pub fn save_to_file(path: &str, contents: &str) -> io::Result<()> {
     let path = Path::new(path);
 
     if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent).unwrap();
+        fs::create_dir_all(parent)?;
     }
 
-    let mut file = File::create(path).unwrap();
-    file.write_all(contents.as_bytes()).unwrap();
+    let mut file = File::create(path)?;
+    file.write_all(contents.as_bytes())?;
     Ok(())
 }

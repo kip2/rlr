@@ -12,7 +12,7 @@ use reqwest::{
 };
 use scraper::{Html, Selector};
 
-use crate::{env::read_env, file::save_to_file};
+use crate::{env::read_env, error::Error, file::save_to_file};
 
 type Cookie = HashMap<String, String>;
 type HTML = String;
@@ -80,8 +80,9 @@ pub fn fetch_problem_page(url: &str) -> HTML {
     body
 }
 
-fn save_cookie_to_file(cookie: String) {
-    save_to_file(COOKIE_PATH, &cookie).unwrap();
+fn save_cookie_to_file(cookie: String) -> Result<(), Error> {
+    save_to_file(COOKIE_PATH, &cookie)?;
+    Ok(())
 }
 
 fn create_client(jar: &Arc<Jar>) -> Client {
