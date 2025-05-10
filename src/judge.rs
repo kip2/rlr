@@ -142,6 +142,7 @@ fn judge_test(input_path: &str, output_path: &str, command_str: &str) -> JudgeRe
     write_to_stdin(&mut child, &input_contents);
     let stdout = child.wait_with_output().unwrap();
     let actual = String::from_utf8_lossy(&stdout.stdout).to_string();
+    let actual = trim_one_newline(&actual);
 
     let duration = start.elapsed();
 
@@ -155,6 +156,7 @@ fn judge_test(input_path: &str, output_path: &str, command_str: &str) -> JudgeRe
         println!("[{}] {}", *FAILURE_LABEL, *WA_LABEL);
         println!("input:\n {}", input_contents);
         println!("output:\n {}", actual);
+        println!();
         println!("expected:\n {}", output_contents);
     }
 
@@ -163,6 +165,14 @@ fn judge_test(input_path: &str, output_path: &str, command_str: &str) -> JudgeRe
     println!();
 
     JudgeResult::new(settion_title.to_string(), is_success, duration)
+}
+
+fn trim_one_newline(s: &str) -> &str {
+    if s.ends_with('\n') {
+        &s[..s.len() - 1]
+    } else {
+        s
+    }
 }
 
 fn write_to_stdin(child: &mut Child, contents: &str) {
