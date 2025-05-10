@@ -7,6 +7,7 @@ use std::{
     process::{Child, Command, Stdio},
     time::{Duration, Instant},
 };
+use wait_timeout::ChildExt;
 
 pub static SUCCESS_LABEL: Lazy<String> = Lazy::new(|| "SUCCESS".green().to_string());
 pub static FAILURE_LABEL: Lazy<String> = Lazy::new(|| "FAILURE".red().to_string());
@@ -16,7 +17,7 @@ pub static INFO_LABEL: Lazy<String> = Lazy::new(|| "INFO".blue().to_string());
 pub static AC_LABEL: Lazy<String> = Lazy::new(|| "AC (Accepted)".green().to_string());
 pub static WA_LABEL: Lazy<String> = Lazy::new(|| "WA (Wrong Answer)".red().to_string());
 pub static RE_LABEL: Lazy<String> = Lazy::new(|| "RE (Runtime Error)".yellow().to_string());
-pub static TLE_LABEL: Lazy<String> = Lazy::new(|| "TLE (Time Limit Exceeded)".blue().to_string());
+pub static TLE_LABEL: Lazy<String> = Lazy::new(|| "TLE (Time Limit Exceeded)".yellow().to_string());
 pub static CE_LABEL: Lazy<String> = Lazy::new(|| "CE (Compilation Error)".red().to_string());
 
 #[derive(Debug, PartialEq)]
@@ -120,7 +121,17 @@ pub fn judge(command_str: &str) {
     }
 }
 
+#[derive(Debug)]
+enum Verdict {
+    AC,
+    WA,
+    RE,
+    TLE,
+}
+
 fn judge_test(input_path: &str, output_path: &str, command_str: &str) -> JudgeResult {
+    let timeout = Duration::from_secs(3);
+
     // start time measurement
     let start = Instant::now();
 
@@ -140,24 +151,59 @@ fn judge_test(input_path: &str, output_path: &str, command_str: &str) -> JudgeRe
         .expect("Failed to execute on Unix-like system");
 
     write_to_stdin(&mut child, &input_contents);
-    let stdout = child.wait_with_output().unwrap();
-    let actual = String::from_utf8_lossy(&stdout.stdout).to_string();
-    let actual = trim_one_newline(&actual);
+
+    let wait_result = child.wait_timeout(timeout).unwrap();
+
+    let mut actual = String::new();
+
+    let verdict = if wait_result.is_none() {
+        let _ = child.kill();
+        Verdict::TLE
+    } else {
+        let status = wait_result.unwrap();
+        if !status.success() {
+            Verdict::RE
+        } else {
+            let stdout = child.wait_with_output().unwrap();
+            actual = String::from_utf8_lossy(&stdout.stdout).to_string();
+            actual = trim_one_newline(&actual).to_string();
+            if actual.trim() == output_contents.trim() {
+                Verdict::AC
+            } else {
+                Verdict::WA
+            }
+        }
+    };
 
     let duration = start.elapsed();
 
-    println!("[{}] time: {:.6} sec", *INFO_LABEL, duration.as_secs_f64());
-
     let mut is_success = false;
-    if actual.trim() == output_contents.trim() {
-        println!("[{}] {}", *SUCCESS_LABEL, *AC_LABEL);
-        is_success = true;
-    } else {
-        println!("[{}] {}", *FAILURE_LABEL, *WA_LABEL);
-        println!("input:\n {}", input_contents);
-        println!("output:\n {}", actual);
-        println!();
-        println!("expected:\n {}", output_contents);
+
+    match verdict {
+        Verdict::AC => {
+            println!("[{}] time: {:.6} sec", *INFO_LABEL, duration.as_secs_f64());
+            println!("[{}] {}", *SUCCESS_LABEL, *AC_LABEL);
+            is_success = true;
+        }
+        Verdict::WA => {
+            println!("[{}] time: {:.6} sec", *INFO_LABEL, duration.as_secs_f64());
+            println!("[{}] {}", *FAILURE_LABEL, *WA_LABEL);
+            println!("input:\n {}", input_contents);
+            println!("output:\n {}", actual);
+            println!();
+            println!("expected:\n {}", output_contents);
+        }
+        Verdict::RE => {
+            println!("[{}] {}", *FAILURE_LABEL, *RE_LABEL);
+        }
+        Verdict::TLE => {
+            println!("[{}] {}", *FAILURE_LABEL, *TLE_LABEL);
+            println!(
+                "[{}] {}",
+                *INFO_LABEL,
+                "The program ran for more than 3 seconds.".white()
+            );
+        }
     }
 
     println!();
