@@ -18,19 +18,26 @@ impl TestCase {
 }
 
 pub fn save_test_cases(test_cases: Vec<TestCase>) -> Result<(), Error> {
-    let prefix_path = "./sample/";
-    let prefix_input_file = "input-";
-    let prefix_output_file = "output-";
+    let prefix_path = "./testcase/";
+    let prefix_file = "testcase-";
+    let suffix_input_file = ".in";
+    let suffix_output_file = ".out";
 
     for (i, case) in test_cases.iter().enumerate() {
         let index = i + 1;
         // save input file
-        let input_file_path = format!("{}{}{}", prefix_path, prefix_input_file, index);
+        let input_file_path = format!(
+            "{}{}{}{}",
+            prefix_path, prefix_file, index, suffix_input_file
+        );
         let input_flle_content = format_vec_str(&case.input);
         save_to_file(&input_file_path, &input_flle_content)?;
 
         // save output file
-        let output_file_path = format!("{}{}{}", prefix_path, prefix_output_file, index);
+        let output_file_path = format!(
+            "{}{}{}{}",
+            prefix_path, prefix_file, index, suffix_output_file
+        );
         let output_file_contnet = &case.output;
         save_to_file(&output_file_path, &output_file_contnet)?;
     }
