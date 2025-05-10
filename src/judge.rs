@@ -51,7 +51,7 @@ impl JudgeResult {
     }
 }
 
-pub fn judge() {
+pub fn judge(command_str: &str) {
     let dir_path = "./testcase";
     let file_list = create_testfile_list(dir_path);
     let version_info = "takerectc 1.0.0";
@@ -74,7 +74,7 @@ pub fn judge() {
     for testfile in file_list {
         let input_file_path = testfile.input_file;
         let output_file_path = testfile.output_file;
-        let result = judge_test(&input_file_path, &output_file_path);
+        let result = judge_test(&input_file_path, &output_file_path, command_str);
 
         // increment success case count
         if result.is_success {
@@ -114,18 +114,14 @@ pub fn judge() {
         );
     } else {
         println!(
-            "[{}] test {}: {} | test {}: {}",
-            *FAILURE_LABEL,
-            *PASSED_LABEL,
-            success_case,
-            *FAILED_LABEL,
-            total_case - success_case
+            "[{}] test {}: {}",
+            *FAILURE_LABEL, *FAILED_LABEL, total_case
         );
     }
 }
 
 // todo: 未実装箇所あり
-fn judge_test(input_path: &str, output_path: &str) -> JudgeResult {
+fn judge_test(input_path: &str, output_path: &str, command_str: &str) -> JudgeResult {
     // start time measurement
     let start = Instant::now();
 
@@ -136,13 +132,17 @@ fn judge_test(input_path: &str, output_path: &str) -> JudgeResult {
     let input_contents = read_file(input_path);
     let output_contents = read_file(output_path);
 
-    let mut child = Command::new("cat")
+    let mut child = Command::new("sh")
+        .arg("-c")
+        .arg(command_str)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
-        .unwrap();
+        .expect("Failed to execute on Unix-like system");
 
     write_to_stdin(&mut child, &input_contents);
+    let stdout = child.wait_with_output().unwrap();
+    let actual = String::from_utf8_lossy(&stdout.stdout).to_string();
 
     // todo: execute solve code.
 
@@ -151,12 +151,13 @@ fn judge_test(input_path: &str, output_path: &str) -> JudgeResult {
     println!("[{}] time: {:.6} sec", *INFO_LABEL, duration.as_secs_f64());
 
     let mut is_success = false;
-    if input_contents == output_contents {
+    if actual.trim() == output_contents.trim() {
         println!("[{}] {}", *SUCCESS_LABEL, *AC_LABEL);
         is_success = true;
     } else {
         println!("[{}] {}", *FAILURE_LABEL, *WA_LABEL);
         println!("input:\n {}", input_contents);
+        println!("output:\n {}", actual);
         println!("expected:\n {}", output_contents);
     }
 

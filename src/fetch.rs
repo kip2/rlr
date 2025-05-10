@@ -20,6 +20,7 @@ type HTML = String;
 // todo: あとで設定ファイル読み込みでパスを繋げられるようにしておく
 const COOKIE_PATH: &str = "./cookie/cookiejar";
 
+// todo: 認証失敗した場合の処理が必要
 pub fn initial_auth() {
     let jar = Arc::new(Jar::default());
     let client = create_client(&jar);

@@ -1,15 +1,18 @@
 use error::handle_error;
 use fetch::fetch_problem_page;
+use judge::judge;
 use parser::{get_test_cases, save_test_cases};
 
 mod env;
 mod error;
 mod fetch;
 mod file;
+mod judge;
 mod parser;
 
 fn main() {
-    run();
+    let command_str = "bb ./tests/main.clj";
+    judge(command_str);
 }
 
 fn run() {
