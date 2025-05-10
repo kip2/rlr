@@ -120,7 +120,6 @@ pub fn judge(command_str: &str) {
     }
 }
 
-// todo: 未実装箇所あり
 fn judge_test(input_path: &str, output_path: &str, command_str: &str) -> JudgeResult {
     // start time measurement
     let start = Instant::now();
@@ -143,8 +142,6 @@ fn judge_test(input_path: &str, output_path: &str, command_str: &str) -> JudgeRe
     write_to_stdin(&mut child, &input_contents);
     let stdout = child.wait_with_output().unwrap();
     let actual = String::from_utf8_lossy(&stdout.stdout).to_string();
-
-    // todo: execute solve code.
 
     let duration = start.elapsed();
 
