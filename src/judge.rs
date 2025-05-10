@@ -200,8 +200,8 @@ fn judge_test(input_path: &str, output_path: &str, command_str: &str) -> JudgeRe
             println!("[{}] {}", *FAILURE_LABEL, *TLE_LABEL);
             println!(
                 "[{}] {}",
-                *INFO_LABEL,
-                "The program ran for more than 3 seconds.".white()
+                *FAILURE_LABEL,
+                "The program ran for more than 3 seconds.".red()
             );
         }
     }
