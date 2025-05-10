@@ -2,7 +2,7 @@ use regex::Regex;
 use scraper::{Html, Selector};
 
 #[derive(Debug, PartialEq)]
-struct TestCase {
+pub struct TestCase {
     input: Vec<String>,
     output: String,
 }
@@ -13,7 +13,7 @@ impl TestCase {
     }
 }
 
-fn get_test_cases(html: &str) -> Vec<TestCase> {
+pub fn get_test_cases(html: &str) -> Vec<TestCase> {
     let raw_test_cases = pickup_test_case(html);
 
     raw_test_cases
