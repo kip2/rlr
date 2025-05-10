@@ -5,7 +5,7 @@ use std::{
     fs::{self},
     io::Write,
     process::{Child, Command, Stdio},
-    time::Instant,
+    time::{Duration, Instant},
 };
 
 pub static SUCCESS_LABEL: Lazy<String> = Lazy::new(|| "SUCCESS".green().to_string());
@@ -34,10 +34,29 @@ impl TestFile {
     }
 }
 
+#[derive(Debug)]
+struct JudgeResult {
+    case_name: String,
+    is_success: bool,
+    elapsed_time: Duration,
+}
+
+impl JudgeResult {
+    fn new(case_name: String, is_success: bool, elapsed_time: Duration) -> Self {
+        Self {
+            is_success,
+            elapsed_time,
+            case_name,
+        }
+    }
+}
+
 pub fn judge() {
     let dir_path = "./testcase";
     let file_list = create_testfile_list(dir_path);
     let version_info = "takerectc 1.0.0";
+    let mut slowest_elapsed_time = Duration::new(0, 0);
+    let mut slowest_elapsed_case = String::new();
 
     // start message
     println!("[{}] {}", *INFO_LABEL, version_info);
@@ -57,13 +76,27 @@ pub fn judge() {
         let output_file_path = testfile.output_file;
         let result = judge_test(&input_file_path, &output_file_path);
 
-        if result {
+        // increment success case count
+        if result.is_success {
             success_case += 1;
+        }
+
+        // compare elapsed time
+        if slowest_elapsed_time < result.elapsed_time {
+            slowest_elapsed_time = result.elapsed_time;
+            slowest_elapsed_case = result.case_name;
         }
     }
 
     // end message
     println!("[{}] end judge", *INFO_LABEL);
+
+    println!(
+        "[{}] slowest: {:.6} sec (for {})",
+        *INFO_LABEL,
+        slowest_elapsed_time.as_secs_f64(),
+        slowest_elapsed_case
+    );
 
     if success_case == total_case {
         println!(
@@ -92,7 +125,7 @@ pub fn judge() {
 }
 
 // todo: 未実装箇所あり
-fn judge_test(input_path: &str, output_path: &str) -> bool {
+fn judge_test(input_path: &str, output_path: &str) -> JudgeResult {
     // start time measurement
     let start = Instant::now();
 
@@ -117,21 +150,21 @@ fn judge_test(input_path: &str, output_path: &str) -> bool {
 
     println!("[{}] time: {:.6} sec", *INFO_LABEL, duration.as_secs_f64());
 
-    let mut result = false;
+    let mut is_success = false;
     if input_contents == output_contents {
         println!("[{}] {}", *SUCCESS_LABEL, *AC_LABEL);
-        result = true;
+        is_success = true;
     } else {
         println!("[{}] {}", *FAILURE_LABEL, *WA_LABEL);
         println!("input:\n {}", input_contents);
-        println!("output:\n {}", output_contents);
+        println!("expected:\n {}", output_contents);
     }
 
     println!();
     println!("---------------------------");
     println!();
 
-    result
+    JudgeResult::new(settion_title.to_string(), is_success, duration)
 }
 
 fn write_to_stdin(child: &mut Child, contents: &str) {
