@@ -16,6 +16,9 @@ pub enum Error {
 
     #[error("内部エラーが発生しました。開発者に連絡して下さい。")]
     Internal,
+
+    #[error("Failed to determine cookie path")]
+    CookiePathMissing,
 }
 
 pub fn handle_error(e: Error) {

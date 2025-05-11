@@ -4,8 +4,8 @@ use std::{
     path::Path,
 };
 
-pub fn save_to_file(path: &str, contents: &str) -> io::Result<()> {
-    let path = Path::new(path);
+pub fn save_to_file<P: AsRef<Path>>(path: &P, contents: &str) -> io::Result<()> {
+    let path = path.as_ref();
 
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent)?;

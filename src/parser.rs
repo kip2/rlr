@@ -1,4 +1,9 @@
-use crate::error::Error;
+use std::fmt::format;
+
+use crate::{
+    error::Error,
+    messages::{INFO_LABEL, SUCCESS_LABEL},
+};
 use log::Log;
 use regex::Regex;
 use scraper::{Html, Selector};
@@ -31,7 +36,10 @@ pub fn save_test_cases(test_cases: Vec<TestCase>, problem_id: &str) -> Result<()
             prefix_path, prefix_file, index, suffix_input_file
         );
         let input_flle_content = format_vec_str(&case.input);
+        println!("[{}] testcase {}", *INFO_LABEL, index);
+
         save_to_file(&input_file_path, &input_flle_content)?;
+        println!("[{}] Saved to : {}", *SUCCESS_LABEL, &input_file_path);
 
         // save output file
         let output_file_path = format!(
@@ -40,6 +48,8 @@ pub fn save_test_cases(test_cases: Vec<TestCase>, problem_id: &str) -> Result<()
         );
         let output_file_contnet = &case.output;
         save_to_file(&output_file_path, &output_file_contnet)?;
+        println!("[{}] Saved to : {}", *SUCCESS_LABEL, &output_file_path);
+        println!();
     }
 
     Ok(())
