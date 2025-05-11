@@ -180,7 +180,29 @@ rlr d "https://recursionist.io/dashboard/problems/1"
 
 ### ジャッジを行う
 
-ジャッジを行うには`judge`コマンドを使用して下さい。
+ジャッジを行うには、先ほどダウンロードしたテストケース(`problem-1`)が存在するディレクトリで`judge`コマンドを使用して下さい。
+
+```sh
+└── problem-1   # <- このディレクトリに移動して実行する。
+    └── testcase
+        ├── testcase-1.in
+        ├── testcase-1.out
+        ├── testcase-2.in
+        ├── testcase-2.out
+        ├── testcase-3.in
+        ├── testcase-3.out
+        ├── testcase-4.in
+        ├── testcase-4.out
+        ├── testcase-5.in
+        └── testcase-5.out
+```
+
+つまり、`problem-1`ディレクトリが存在した場合は、コマンドで移動してから実行して下さい。
+
+```sh
+# problem-1の例
+cd problem-1
+```
 
 `judege`コマンドは以下のような構造になっています。
 
