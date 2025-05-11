@@ -1165,6 +1165,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "rlr"
+version = "0.1.0"
+dependencies = [
+ "colored",
+ "dotenv",
+ "log",
+ "once_cell",
+ "regex",
+ "reqwest",
+ "scraper",
+ "thiserror",
+ "wait-timeout",
+]
+
+[[package]]
 name = "rustc-demangle"
 version = "0.1.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1486,21 +1501,6 @@ checksum = "8e1d1b10ced5ca923a1fcb8d03e96b8d3268065d724548c0211415ff6ac6bac4"
 dependencies = [
  "core-foundation-sys",
  "libc",
-]
-
-[[package]]
-name = "tekerectc"
-version = "0.1.0"
-dependencies = [
- "colored",
- "dotenv",
- "log",
- "once_cell",
- "regex",
- "reqwest",
- "scraper",
- "thiserror",
- "wait-timeout",
 ]
 
 [[package]]

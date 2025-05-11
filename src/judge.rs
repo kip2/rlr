@@ -55,7 +55,7 @@ impl JudgeResult {
 pub fn judge(command_str: &str) {
     let dir_path = "./testcase";
     let file_list = create_testfile_list(dir_path);
-    let version_info = "takerectc 1.0.0";
+    let version_info = "Recursion local runner 1.0.0";
     let mut slowest_elapsed_time = Duration::new(0, 0);
     let mut slowest_elapsed_case = String::new();
 
