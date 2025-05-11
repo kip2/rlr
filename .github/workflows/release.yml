@@ -39,7 +39,13 @@ jobs:
       - name: Archive binary
         shell: bash
         run: |
-          binary_name="rlr"
+          binary_base="rlr"
+          ext=""
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            ext=".exe"
+          fi
+
+          binary_name="${binary_base}${ext}"
           target_dir="target/${{ matrix.target }}/release"
           archive_name="${binary_name}-${{ matrix.target }}.tar.gz"
 
