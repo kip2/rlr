@@ -8,7 +8,6 @@ use regex::Regex;
 use request::download;
 use request::initial_auth;
 
-mod env;
 mod error;
 mod file;
 mod judge;
