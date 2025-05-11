@@ -1,11 +1,6 @@
-# Todo
-- [ ] XXXの箇所を変更する(検索しながらやると良いと思います)
-- [ ] 独自の記載が必要なら記載する
-- [ ] 最後にこのTodoリストを削除する
+# Pythonでの問題の解き方
 
-# XXXでの問題の解き方
-
-XXXを使って問題を解く際のやり方を記載します。
+Pythonを使って問題を解く際のやり方を記載します。
 
 ## インストールと使い方
 
@@ -34,7 +29,7 @@ chmod +x setup.sh
 $ tree problem-1 
 
 problem-1
-├── main.XXX # <- ここを編集する
+├── main.py
 ├── run.sh
 └── testcase
     ├── testcase-1.in
@@ -47,11 +42,13 @@ problem-1
     ├── testcase-4.out
     ├── testcase-5.in
     └── testcase-5.out
+
+2 directories, 12 files
 ```
 
 ## 問題を解くコードを書く
 
-`main.XXX`に問題を解くコードを書いて下さい。
+`main.py`に問題を解くコードを書いて下さい。
 どのようなコードを記載したらよいかは、[問題の解き方](../../問題の解き方.md)を参照して下さい。
 
 ## 実行
@@ -74,5 +71,5 @@ chmod +x run.sh
 ```sh
 #!/bin/bash
 
-rlr judge "XXX"
+rlr judge "python3 main.py"
 ```
