@@ -1,4 +1,9 @@
-<h1 align="center">rlr</h1>
+<h1 align="center">
+  <strong style="font-size:2em;">rlr</strong>
+</h1>
+<h4 align="center">Recursion Local Runner</h4>
+
+---
 
 rlr(Recursion Local Runner)は、RecursionCSで公開されている問題を、ローカル環境で実行するためのツールです。
 
@@ -171,7 +176,7 @@ rlr d "https://recursionist.io/dashboard/problems/1"
 
 好きなエディタを用いて問題を解くコードを記載して下さい。
 
-その際の注意事項等については[PRの出し方](./document/usage/README.md)を参照して下さい。
+その際の注意事項等については[問題の解き方](./document/問題の解き方.md)を参照して下さい。
 
 ### ジャッジを行う
 
@@ -196,7 +201,7 @@ rlr judge "<command>"
 rlr judge "python3 main.py"
 ```
 
-> **NOTE:**指定する`command`は必ず文字列である必要があります。`""`で囲って下さい。
+> **NOTE:** 指定する`command`は必ず文字列である必要があります。`""`で囲って下さい。
 
 > **NOTE:** `rlr`は、`input`となるテストケースを標準入力で受け取り、`judge`で指定した`command`に対してパイプ処理で受け渡して処理した後、標準出力を`output`のケースと比較します。
 > つまり、標準入力を受け取って出力できる形での実行`command`なら何でも使えます。
@@ -233,7 +238,7 @@ PRの投げ方についてはdocument内に記載していますので、参照�
 
 ## Special Thanks
 
-`rlr`は[oj](https://github.com/online-judge-tools/oj)に、インスパイアされて作成しています。
+`rlr`は [oj](https://github.com/online-judge-tools/oj) に、インスパイアされて作成しています。
 
 ## License
 
