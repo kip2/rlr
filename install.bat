@@ -9,9 +9,15 @@ set URL=https://github.com/%REPO%/releases/download/%TAG%/%FILE%
 
 echo Downloading %URL%
 curl -L -o %FILE% %URL%
-mkdir %INSTALL_DIR%
-tar -xf %FILE% -C %INSTALL_DIR%
-del %FILE%
+
+echo Creating install directory: %INSTALL_DIR%
+mkdir "%INSTALL_DIR%"
+
+echo Extracting %FILE%
+powershell -Command "Expand-Archive -Path '%CD%\%FILE%' -DestinationPath '%INSTALL_DIR%' -Force"
+
+echo Deleting archive
+del "%FILE%"
 
 for /f "tokens=*" %%i in ('powershell -command "[System.Environment]::GetEnvironmentVariable('Path', 'User')"') do set "CURRENT_PATH=%%i"
 
