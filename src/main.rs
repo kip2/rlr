@@ -26,7 +26,12 @@ mod request;
     1. loginオプションを使用して、Recursionへの初回ログインを行って下さい。\n\
     2. downloadオプションで、取得したい問題ページのURLを引数に与え、テストケースの値を取得して下さい。\n\
     3. 好きな言語・好きなエディタで問題を解くコードを書いてください。\n\
-    4. 3で書いたコードをシェルから実行するコマンドを用意し、コマンド実行文字列として与えて実行して下さい。 "
+    4. 3で書いたコードをシェルから実行するコマンドを用意し、コマンド実行文字列として与えて実行して下さい。 ",
+    override_usage = "\
+    \n
+    login:    rlr login または rlr l
+    donwload: rlr download <URL> または rlr d <URL>
+    judge:    rlr judge <COMMAND> または rlr j <COMMAND>"
 )]
 struct Cli {
     #[command(subcommand)]
@@ -38,10 +43,13 @@ enum Commands {
     #[command(alias = "l", about = "Recursionへのログイン処理を行います。")]
     Login,
 
-    #[command(alias = "d", about = "download about")]
+    #[command(alias = "d", about = "指定したurlのテストケースをダウンロードします。")]
     Download(DownloadArgs),
 
-    #[command(alias = "j", about = "judge about")]
+    #[command(
+        alias = "j",
+        about = "カレントディレクトリにあるtestcaseディレクトリに対して、指定されたコマンドを使用してテストを実行します"
+    )]
     Judge(JudgeArgs),
 }
 
