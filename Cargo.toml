@@ -13,3 +13,5 @@ thiserror = "2.0.12"
 log = "0.4.27"
 colored = "3.0.0"
 wait-timeout = "0.2.1"
+clap = { version = "4.5.38", features = ["derive"] }
+rpassword = "7.4.0"
