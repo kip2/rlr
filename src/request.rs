@@ -95,7 +95,7 @@ fn is_login_successful(location: &str) -> bool {
 }
 
 pub fn download(url: &str) {
-    let html = fetch_problem_page(url);
+    let html = fetch_problem_page(url).unwrap();
 
     let problem_id = extract_url_number(url);
 
@@ -121,7 +121,7 @@ enum Redirect {
     OFF,
 }
 
-fn fetch_problem_page(url: &str) -> HTML {
+fn fetch_problem_page(url: &str) -> Result<HTML, Error> {
     let jar = Arc::new(Jar::default());
     let client = create_client(Redirect::ON, &jar);
 
@@ -132,6 +132,15 @@ fn fetch_problem_page(url: &str) -> HTML {
 
     println!("[{}] GET: {}", *NETWORK_LABEL, url);
     let res = get_page_with_cookie(&client, url, &cookie_header).unwrap();
+
+    let final_url = res.url().as_str();
+    if final_url != url {
+        return Err(Error::Unexpectedredirect {
+            expected: url.to_string(),
+            actual: final_url.to_string(),
+        });
+    }
+
     println!("[{}] {}", *NETWORK_LABEL, res.status());
     println!();
 
@@ -146,7 +155,7 @@ fn fetch_problem_page(url: &str) -> HTML {
     save_cookie_to_file(response_cookie).unwrap();
 
     let body = res.text().unwrap();
-    body
+    Ok(body)
 }
 
 fn save_cookie_to_file(cookie: String) -> Result<(), Error> {

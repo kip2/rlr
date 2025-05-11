@@ -19,6 +19,9 @@ pub enum Error {
 
     #[error("Failed to determine cookie path")]
     CookiePathMissing,
+
+    #[error("Redirected to unexpected URL: expected {expected}, got {actual}")]
+    Unexpectedredirect { expected: String, actual: String },
 }
 
 pub fn handle_error(e: Error) {
