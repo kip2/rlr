@@ -1,7 +1,7 @@
 use std::{
     collections::HashMap,
     fs::File,
-    io::{BufRead, BufReader, Write},
+    io::{BufRead, BufReader},
     sync::Arc,
 };
 
@@ -12,16 +12,20 @@ use reqwest::{
 };
 use scraper::{Html, Selector};
 
-use crate::{env::read_env, error::Error, file::save_to_file};
+use crate::{
+    error::{Error, handle_error},
+    file::save_to_file,
+    parser::{get_test_cases, save_test_cases},
+};
 
 type Cookie = HashMap<String, String>;
 type HTML = String;
 
 // todo: あとで設定ファイル読み込みでパスを繋げられるようにしておく
-const COOKIE_PATH: &str = "./cookie/cookiejar";
+const COOKIE_PATH: &str = "./rlr/cookie/cookie.jar";
 
 // todo: 認証失敗した場合の処理が必要
-pub fn initial_auth() {
+pub fn initial_auth(email: &str, password: &str) {
     let jar = Arc::new(Jar::default());
     let client = create_client(&jar);
 
@@ -34,13 +38,10 @@ pub fn initial_auth() {
 
     let token = extract_token_from_html(&login_html).expect("CSRF _token not found");
 
-    let email = read_env("EMAIL");
-    let password = read_env("PASSWORD");
-
     let mut form = HashMap::new();
     form.insert("email", email);
     form.insert("password", password);
-    form.insert("_token", token);
+    form.insert("_token", &token);
 
     client
         .post("https://recursionist.io/login")
@@ -55,10 +56,23 @@ pub fn initial_auth() {
     let cookies = jar.cookies(&url).unwrap();
     let cookie_str = cookies.to_str().unwrap().to_string();
 
-    save_cookie_to_file(cookie_str);
+    save_cookie_to_file(cookie_str).unwrap();
 }
 
-pub fn fetch_problem_page(url: &str) -> HTML {
+pub fn download(url: &str) {
+    let html = fetch_problem_page(url);
+
+    match get_test_cases(&html) {
+        Ok(test_cases) => {
+            if let Err(e) = save_test_cases(test_cases) {
+                handle_error(e);
+            }
+        }
+        Err(e) => handle_error(e),
+    }
+}
+
+fn fetch_problem_page(url: &str) -> HTML {
     let jar = Arc::new(Jar::default());
     let client = create_client(&jar);
 
@@ -139,7 +153,7 @@ mod tests {
 
     #[test]
     fn test_load_cookies() {
-        let path = "./tests/cookiejar";
+        let path = "./tests/cookie.jar";
 
         let actual = load_cookies(path).unwrap();
 
@@ -161,7 +175,7 @@ mod tests {
 
     #[test]
     fn test_format_cookie_header() {
-        let path = "./tests/cookiejar";
+        let path = "./tests/cookie.jar";
 
         let cookies = load_cookies(path).unwrap();
 
