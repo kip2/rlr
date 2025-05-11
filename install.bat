@@ -1,0 +1,27 @@
+@echo off
+setlocal
+
+set TAG=v0.1.0
+set REPO=kip2/rlr
+set FILE=rlr-x86_64-pc-windows-msvc.zip
+set INSTALL_DIR=%USERPROFILE%\rlr-bin
+set URL=https://github.com/%REPO%/releases/download/%TAG%/%FILE%
+
+echo Downloading %URL%
+curl -L -o %FILE% %URL%
+mkdir %INSTALL_DIR%
+tar -xf %FILE% -C %INSTALL_DIR%
+del %FILE%
+
+for /f "tokens=*" %%i in ('powershell -command "[System.Environment]::GetEnvironmentVariable('Path', 'User')"') do set "CURRENT_PATH=%%i"
+
+echo %CURRENT_PATH% | find /i "%INSTALL_DIR%" >nul
+if errorlevel 1 (
+    echo Adding %INSTALL_DIR% to PATH
+    powershell -Command "[Environment]::SetEnvironmentVariable('Path', '%CURRENT_PATH%;%INSTALL_DIR%', 'User')"
+) else (
+    echo PATH already contains %INSTALL_DIR%
+)
+
+echo Done. You may need to restart your terminal.
+endlocal
