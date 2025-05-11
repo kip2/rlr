@@ -17,8 +17,8 @@ impl TestCase {
     }
 }
 
-pub fn save_test_cases(test_cases: Vec<TestCase>) -> Result<(), Error> {
-    let prefix_path = "./testcase/";
+pub fn save_test_cases(test_cases: Vec<TestCase>, problem_id: &str) -> Result<(), Error> {
+    let prefix_path = format!("./problem-{}/testcase/", problem_id);
     let prefix_file = "testcase-";
     let suffix_input_file = ".in";
     let suffix_output_file = ".out";

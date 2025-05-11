@@ -5,6 +5,7 @@ use std::{
     sync::Arc,
 };
 
+use regex::Regex;
 use reqwest::{
     Url,
     blocking::{Client, Response},
@@ -62,14 +63,23 @@ pub fn initial_auth(email: &str, password: &str) {
 pub fn download(url: &str) {
     let html = fetch_problem_page(url);
 
+    let problem_id = extract_url_number(url);
+
     match get_test_cases(&html) {
         Ok(test_cases) => {
-            if let Err(e) = save_test_cases(test_cases) {
+            if let Err(e) = save_test_cases(test_cases, &problem_id) {
                 handle_error(e);
             }
         }
         Err(e) => handle_error(e),
     }
+}
+
+fn extract_url_number(url: &str) -> String {
+    let re = Regex::new(r"/problems/(\d+)$").unwrap();
+    let caps = re.captures(url).unwrap();
+    let matched = caps.get(1).unwrap();
+    matched.as_str().to_string()
 }
 
 fn fetch_problem_page(url: &str) -> HTML {
@@ -89,7 +99,7 @@ fn fetch_problem_page(url: &str) -> HTML {
         .unwrap()
         .to_string();
 
-    save_cookie_to_file(response_cookie);
+    save_cookie_to_file(response_cookie).unwrap();
 
     let body = res.text().unwrap();
     body
@@ -150,6 +160,12 @@ fn load_cookies(path: &str) -> Result<Cookie, Box<dyn std::error::Error>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_extract_url_number() {
+        let url = "https://example.com/dashboard/problems/42";
+        assert_eq!(extract_url_number(url), "42".to_string());
+    }
 
     #[test]
     fn test_load_cookies() {
