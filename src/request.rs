@@ -31,15 +31,6 @@ enum Redirect {
     OFF,
 }
 
-pub fn get_cookie_path() -> Option<std::path::PathBuf> {
-    if let Some(project_dir) = ProjectDirs::from("Recursion", "tool", "rlr") {
-        let config_dir = project_dir.config_dir();
-        Some(config_dir.join("cookie.jar"))
-    } else {
-        None
-    }
-}
-
 pub fn initial_auth(email: &str, password: &str) {
     println!("[{}] Start Login process.", *INFO_LABEL);
 
@@ -95,10 +86,6 @@ pub fn initial_auth(email: &str, password: &str) {
     }
 }
 
-fn is_login_successful(location: &str) -> bool {
-    location == "https://recursionist.io/dashboard"
-}
-
 pub fn download(arg_s: &str) {
     let url = if is_natural_number(arg_s) {
         create_url(arg_s)
@@ -117,6 +104,19 @@ pub fn download(arg_s: &str) {
             }
         }
         Err(e) => handle_error(e),
+    }
+}
+
+fn is_login_successful(location: &str) -> bool {
+    location == "https://recursionist.io/dashboard"
+}
+
+fn get_cookie_path() -> Option<std::path::PathBuf> {
+    if let Some(project_dir) = ProjectDirs::from("Recursion", "tool", "rlr") {
+        let config_dir = project_dir.config_dir();
+        Some(config_dir.join("cookie.jar"))
+    } else {
+        None
     }
 }
 
