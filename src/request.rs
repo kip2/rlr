@@ -1,3 +1,4 @@
+use core::num;
 use std::{
     collections::HashMap,
     fs::File,
@@ -94,10 +95,16 @@ fn is_login_successful(location: &str) -> bool {
     location == "https://recursionist.io/dashboard"
 }
 
-pub fn download(url: &str) {
-    let html = fetch_problem_page(url).unwrap();
+pub fn download(arg_s: &str) {
+    let url = if is_natural_number(arg_s) {
+        create_url(arg_s)
+    } else {
+        arg_s.to_string()
+    };
 
-    let problem_id = extract_url_number(url);
+    let html = fetch_problem_page(&url).unwrap();
+
+    let problem_id = extract_url_number(&url);
 
     match get_test_cases(&html) {
         Ok(test_cases) => {
@@ -107,6 +114,43 @@ pub fn download(url: &str) {
         }
         Err(e) => handle_error(e),
     }
+}
+
+fn create_url(num_str: &str) -> String {
+    let prefix = "https://recursionist.io/dashboard/problems/";
+    format!("{}{}", prefix, num_str)
+}
+
+fn is_natural_number(s: &str) -> bool {
+    s.parse::<u32>().is_ok()
+}
+
+#[test]
+fn test_create_url() {
+    let num_str = "1";
+    let actual = create_url(num_str);
+
+    let expected = "https://recursionist.io/dashboard/problems/1";
+
+    assert_eq!(actual, expected);
+}
+#[test]
+fn test_is_natural_number() {
+    let num_str = "1";
+
+    assert!(is_natural_number(num_str));
+
+    let num_str = "-1";
+
+    assert!(!is_natural_number(num_str));
+
+    let num_str = "0";
+
+    assert!(is_natural_number(num_str));
+
+    let num_str = "1.5";
+
+    assert!(!is_natural_number(num_str));
 }
 
 fn extract_url_number(url: &str) -> String {
