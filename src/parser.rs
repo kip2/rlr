@@ -52,13 +52,6 @@ pub fn save_test_cases(test_cases: Vec<TestCase>, problem_id: &str) -> Result<()
     Ok(())
 }
 
-fn format_vec_str(s: &Vec<String>) -> String {
-    s.iter()
-        .map(|s| s.as_str())
-        .collect::<Vec<&str>>()
-        .join(" ")
-}
-
 pub fn get_test_cases(html: &str) -> Result<Vec<TestCase>, Error> {
     let raw_test_cases = pickup_test_case(html)?;
 
@@ -75,6 +68,13 @@ pub fn get_test_cases(html: &str) -> Result<Vec<TestCase>, Error> {
         .collect();
 
     result
+}
+
+fn format_vec_str(s: &Vec<String>) -> String {
+    s.iter()
+        .map(|s| s.as_str())
+        .collect::<Vec<&str>>()
+        .join(" ")
 }
 
 fn selector_error<E: std::fmt::Display>(e: E) -> Error {

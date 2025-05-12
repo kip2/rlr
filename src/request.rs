@@ -1,4 +1,3 @@
-use core::num;
 use std::{
     collections::HashMap,
     fs::File,
@@ -26,6 +25,11 @@ use crate::{
 
 type Cookie = HashMap<String, String>;
 type HTML = String;
+
+enum Redirect {
+    ON,
+    OFF,
+}
 
 pub fn get_cookie_path() -> Option<std::path::PathBuf> {
     if let Some(project_dir) = ProjectDirs::from("Recursion", "tool", "rlr") {
@@ -125,44 +129,11 @@ fn is_natural_number(s: &str) -> bool {
     s.parse::<u32>().is_ok()
 }
 
-#[test]
-fn test_create_url() {
-    let num_str = "1";
-    let actual = create_url(num_str);
-
-    let expected = "https://recursionist.io/dashboard/problems/1";
-
-    assert_eq!(actual, expected);
-}
-#[test]
-fn test_is_natural_number() {
-    let num_str = "1";
-
-    assert!(is_natural_number(num_str));
-
-    let num_str = "-1";
-
-    assert!(!is_natural_number(num_str));
-
-    let num_str = "0";
-
-    assert!(is_natural_number(num_str));
-
-    let num_str = "1.5";
-
-    assert!(!is_natural_number(num_str));
-}
-
 fn extract_url_number(url: &str) -> String {
     let re = Regex::new(r"/problems/(\d+)$").unwrap();
     let caps = re.captures(url).unwrap();
     let matched = caps.get(1).unwrap();
     matched.as_str().to_string()
-}
-
-enum Redirect {
-    ON,
-    OFF,
 }
 
 fn fetch_problem_page(url: &str) -> Result<HTML, Error> {
@@ -264,6 +235,34 @@ fn load_cookies<P: AsRef<Path>>(path: P) -> Result<Cookie, Box<dyn std::error::E
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_create_url() {
+        let num_str = "1";
+        let actual = create_url(num_str);
+
+        let expected = "https://recursionist.io/dashboard/problems/1";
+
+        assert_eq!(actual, expected);
+    }
+    #[test]
+    fn test_is_natural_number() {
+        let num_str = "1";
+
+        assert!(is_natural_number(num_str));
+
+        let num_str = "-1";
+
+        assert!(!is_natural_number(num_str));
+
+        let num_str = "0";
+
+        assert!(is_natural_number(num_str));
+
+        let num_str = "1.5";
+
+        assert!(!is_natural_number(num_str));
+    }
 
     #[test]
     fn test_extract_url_number() {

@@ -9,6 +9,21 @@ use std::{
 };
 use wait_timeout::ChildExt;
 
+#[derive(Debug)]
+struct JudgeResult {
+    case_name: String,
+    is_success: bool,
+    elapsed_time: Duration,
+}
+
+#[derive(Debug)]
+enum Verdict {
+    AC,
+    WA,
+    RE,
+    TLE,
+}
+
 #[derive(Debug, PartialEq)]
 pub struct TestFile {
     input_file: String,
@@ -22,13 +37,6 @@ impl TestFile {
             output_file,
         }
     }
-}
-
-#[derive(Debug)]
-struct JudgeResult {
-    case_name: String,
-    is_success: bool,
-    elapsed_time: Duration,
 }
 
 impl JudgeResult {
@@ -108,14 +116,6 @@ pub fn judge(command_str: &str) {
             *FAILURE_LABEL, *FAILED_LABEL, total_case
         );
     }
-}
-
-#[derive(Debug)]
-enum Verdict {
-    AC,
-    WA,
-    RE,
-    TLE,
 }
 
 fn judge_test(input_path: &str, output_path: &str, command_str: &str) -> JudgeResult {
