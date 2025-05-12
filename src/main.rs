@@ -119,13 +119,3 @@ mod tests {
         assert!(!valid_email(wrong_email));
     }
 }
-
-fn run_judge() {
-    let command_str = "bb ./tests/main.clj";
-    judge(command_str);
-}
-
-fn run() {
-    let url = "https://recursionist.io/dashboard/problems/1";
-    download(url);
-}

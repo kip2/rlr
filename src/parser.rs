@@ -1,10 +1,7 @@
-use std::fmt::format;
-
 use crate::{
     error::Error,
     messages::{INFO_LABEL, SUCCESS_LABEL},
 };
-use log::Log;
 use regex::Regex;
 use scraper::{Html, Selector};
 
@@ -110,13 +107,6 @@ fn pickup_test_case(html: &str) -> Result<Vec<String>, Error> {
     Ok(targets)
 }
 
-fn get_input_cases(test_cases: Vec<String>) -> Result<Vec<String>, Error> {
-    test_cases
-        .iter()
-        .map(|case| parse_input_case(case))
-        .collect()
-}
-
 fn parse_input_case(test_case: &str) -> Result<String, Error> {
     let re = match Regex::new(r"\(([^)]+)\)") {
         Ok(re) => re,
@@ -135,13 +125,6 @@ fn parse_input_case(test_case: &str) -> Result<String, Error> {
         .join(",")
         .to_string();
     Ok(result)
-}
-
-fn get_output_cases(test_cases: Vec<String>) -> Result<Vec<String>, Error> {
-    test_cases
-        .iter()
-        .map(|case| parse_output_case(case))
-        .collect()
 }
 
 fn parse_output_case(test_case: &str) -> Result<String, Error> {
@@ -200,76 +183,6 @@ mod tests {
         ];
 
         assert_eq!(results, expecteds);
-    }
-
-    #[test]
-    fn test_get_output_test_cases() {
-        let html = r#"
-        <p class="m-0 rem0p8">
-            getLowestTemperature(3,2) --> 1
-            <span class="cursor-pointer judge-test-button ml-1" data-case="[3,2]">
-                <i class="far fa-play-circle" title="テスト実行"></i>
-            </span>
-        </p>
-        <p class="m-0 rem0p8">
-            getLowestTemperature(2, 10) --> -8
-            <span class="cursor-pointer judge-test-button ml-1" data-case="[2,10]">
-            <i class="far fa-play-circle" title="テスト実行">
-            </i>
-            </span>
-        </p>
-        <p class="m-0 rem0p8">
-            getLowestTemperature( 18,5 ) --> 13
-            <span class="cursor-pointer judge-test-button ml-1" data-case="[18,5]">
-            <i class="far fa-play-circle" title="テスト実行">
-            </i>
-            </span>
-        </p>
-        "#;
-
-        let results = pickup_test_case(html).unwrap();
-        let input_cases = get_output_cases(results).unwrap();
-
-        let expecteds = ["1", "-8", "13"];
-
-        for (i, actual) in input_cases.iter().enumerate() {
-            assert_eq!(actual, expecteds[i]);
-        }
-    }
-
-    #[test]
-    fn test_get_input_test_cases() {
-        let html = r#"
-        <p class="m-0 rem0p8">
-            getLowestTemperature(3,2) --> 1
-            <span class="cursor-pointer judge-test-button ml-1" data-case="[3,2]">
-                <i class="far fa-play-circle" title="テスト実行"></i>
-            </span>
-        </p>
-        <p class="m-0 rem0p8">
-            getLowestTemperature(2, 10) --> -8
-            <span class="cursor-pointer judge-test-button ml-1" data-case="[2,10]">
-            <i class="far fa-play-circle" title="テスト実行">
-            </i>
-            </span>
-        </p>
-        <p class="m-0 rem0p8">
-            getLowestTemperature( 18,5 ) --> 13
-            <span class="cursor-pointer judge-test-button ml-1" data-case="[18,5]">
-            <i class="far fa-play-circle" title="テスト実行">
-            </i>
-            </span>
-        </p>
-        "#;
-
-        let results = pickup_test_case(html).unwrap();
-        let input_cases = get_input_cases(results).unwrap();
-
-        let expecteds = ["3,2", "2,10", "18,5"];
-
-        for (i, actual) in input_cases.iter().enumerate() {
-            assert_eq!(actual, expecteds[i]);
-        }
     }
 
     #[test]
