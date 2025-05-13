@@ -49,6 +49,9 @@ pub enum Error {
     // todo: ユーザーに見せるべきかを検討する
     #[error("")]
     FileNameMissing,
+
+    #[error("")]
+    FormatMismatch,
 }
 
 pub fn handle_error(e: Error) {

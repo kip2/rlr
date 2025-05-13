@@ -130,11 +130,11 @@ fn is_natural_number(s: &str) -> bool {
     s.parse::<u32>().is_ok()
 }
 
-fn extract_url_number(url: &str) -> String {
-    let re = Regex::new(r"/problems/(\d+)$").unwrap();
-    let caps = re.captures(url).unwrap();
-    let matched = caps.get(1).unwrap();
-    matched.as_str().to_string()
+fn extract_url_number(url: &str) -> Result<String, Error> {
+    let re = Regex::new(r"/problems/(\d+)$")?;
+    let caps = re.captures(url).ok_or(Error::FormatMismatch)?;
+    let matched = caps.get(1).ok_or(Error::FormatMismatch)?;
+    Ok(matched.as_str().to_string())
 }
 
 fn fetch_problem_page(url: &str) -> Result<HTML, Error> {
