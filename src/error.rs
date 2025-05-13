@@ -45,6 +45,10 @@ pub enum Error {
 
     #[error("Login failed: redirected to unexpected URL")]
     LoginFailed,
+
+    // todo: ユーザーに見せるべきかを検討する
+    #[error("")]
+    FileNameMissing,
 }
 
 pub fn handle_error(e: Error) {
@@ -99,6 +103,10 @@ pub fn handle_error(e: Error) {
         }
         Error::LoginFailed => {
             eprintln!("ログインに失敗しました。メールアドレスやパスワードをご確認下さい。")
+        }
+        // todo: ユーザーに見せるべきかを検討する
+        Error::FileNameMissing => {
+            eprintln!("ファイル名の取得に失敗しました。")
         }
         _ => {
             eprintln!("予期せぬエラーが発生しました。");

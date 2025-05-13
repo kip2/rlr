@@ -1,3 +1,4 @@
+use crate::error::Error;
 use std::{
     fs::{self, File},
     io::{self, Read, Write},
@@ -16,16 +17,16 @@ pub fn save_to_file<P: AsRef<Path>>(path: &P, contents: &str) -> io::Result<()> 
     Ok(())
 }
 
-pub fn read_file(path: &str) -> String {
-    let mut file = File::open(path).unwrap();
+pub fn read_file(path: &str) -> Result<String, Error> {
+    let mut file = File::open(path)?;
     let mut contents = String::new();
-    file.read_to_string(&mut contents).unwrap();
-    contents
+    file.read_to_string(&mut contents)?;
+    Ok(contents)
 }
 
-pub fn get_file_name(file_path: &str) -> &str {
+pub fn get_file_name(file_path: &str) -> Result<&str, Error> {
     Path::new(file_path)
         .file_stem()
         .and_then(|s| s.to_str())
-        .unwrap()
+        .ok_or(Error::FileNameMissing)
 }
