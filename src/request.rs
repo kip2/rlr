@@ -31,23 +31,23 @@ enum Redirect {
     OFF,
 }
 
-pub fn initial_auth(email: &str, password: &str) {
+pub fn initial_auth(email: &str, password: &str) -> Result<(), Error> {
     println!("[{}] Start Login process.", *INFO_LABEL);
 
     let jar = Arc::new(Jar::default());
-    let client_get = create_client(Redirect::ON, &jar);
+    let client_get = create_client(Redirect::ON, &jar)?;
 
     let request_path = "https://recursionist.io/login";
     println!("[{}] GET: {}", *NETWORK_LABEL, request_path);
 
-    let res = client_get.get(request_path).send().unwrap();
+    let res = client_get.get(request_path).send()?;
     println!("[{}] {}", *NETWORK_LABEL, res.status());
 
-    let login_html = res.text().unwrap();
+    let login_html = res.text()?;
 
-    let token = extract_token_from_html(&login_html).expect("CSRF _token not found");
+    let token = extract_token_from_html(&login_html)?;
 
-    let client_post = create_client(Redirect::OFF, &jar);
+    let client_post = create_client(Redirect::OFF, &jar)?;
 
     let mut form = HashMap::new();
     form.insert("email", email);
@@ -63,26 +63,27 @@ pub fn initial_auth(email: &str, password: &str) {
         .header("Content-Type", "application/x-www-form-urlencoded")
         .header("Referer", "https://recursionist.io/")
         .header("Origin", "https://recursionist.io")
-        .send()
-        .unwrap();
+        .send()?;
 
     println!("[{}] {}", *NETWORK_LABEL, res.status());
 
     let location = res
         .headers()
         .get(LOCATION)
-        .and_then(|v| v.to_str().ok())
-        .unwrap_or("");
+        .ok_or(Error::HeaderMissing)?
+        .to_str()?;
 
     if is_login_successful(location) {
         println!("[{}] Login sucess.", *SUCCESS_LABEL);
-        let url = Url::parse("https://recursionist.io").unwrap();
-        let cookies = jar.cookies(&url).unwrap();
-        let cookie_str = cookies.to_str().unwrap().to_string();
+        let url = Url::parse("https://recursionist.io")?;
+        let cookies = jar.cookies(&url).ok_or(Error::CookieMissing)?;
+        let cookie_str = cookies.to_str()?.to_string();
 
-        save_cookie_to_file(cookie_str).unwrap();
+        save_cookie_to_file(cookie_str)?;
+        Ok(())
     } else {
         println!("[{}] Login failed.", *FAILED_LABEL);
+        Err(Error::LoginFailed)
     }
 }
 
@@ -138,7 +139,7 @@ fn extract_url_number(url: &str) -> String {
 
 fn fetch_problem_page(url: &str) -> Result<HTML, Error> {
     let jar = Arc::new(Jar::default());
-    let client = create_client(Redirect::ON, &jar);
+    let client = create_client(Redirect::ON, &jar)?;
 
     let cookie_path = get_cookie_path().unwrap();
 
@@ -180,15 +181,14 @@ fn save_cookie_to_file(cookie: String) -> Result<(), Error> {
     Ok(())
 }
 
-fn create_client(disable_redirect: Redirect, jar: &Arc<Jar>) -> Client {
+fn create_client(disable_redirect: Redirect, jar: &Arc<Jar>) -> Result<Client, Error> {
     let builder = Client::builder().cookie_provider(jar.clone());
 
-    match disable_redirect {
+    Ok(match disable_redirect {
         Redirect::ON => builder,
         Redirect::OFF => builder.redirect(reqwest::redirect::Policy::none()),
     }
-    .build()
-    .expect("failed to create client")
+    .build()?)
 }
 
 fn format_cookie_header(cookies: Cookie) -> String {
@@ -208,12 +208,17 @@ fn get_page_with_cookie(
     client.get(url).header("Cookie", cookie_header).send()
 }
 
-fn extract_token_from_html(html: &str) -> Option<String> {
+fn extract_token_from_html(html: &str) -> Result<String, Error> {
     let doc = Html::parse_document(html);
-    let selector = Selector::parse(r#"input[name="_token"]"#).ok()?;
-    doc.select(&selector)
+    let selector = Selector::parse(r#"input[name="_token"]"#).map_err(|_| Error::TokenNotFound)?;
+    let token = doc
+        .select(&selector)
         .next()
         .and_then(|e| e.value().attr("value").map(|v| v.to_string()))
+        .map(|v| v.to_string())
+        .ok_or(Error::TokenNotFound)?;
+
+    Ok(token)
 }
 
 fn load_cookies<P: AsRef<Path>>(path: P) -> Result<Cookie, Box<dyn std::error::Error>> {

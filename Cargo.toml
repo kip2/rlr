@@ -17,3 +17,4 @@ wait-timeout = "0.2.1"
 clap = { version = "4.5.38", features = ["derive"] }
 rpassword = "7.4.0"
 directories = "6.0.0"
+url = "2.5.4"
