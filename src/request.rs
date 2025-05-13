@@ -221,16 +221,18 @@ fn extract_token_from_html(html: &str) -> Result<String, Error> {
     Ok(token)
 }
 
-fn load_cookies<P: AsRef<Path>>(path: P) -> Result<Cookie, Box<dyn std::error::Error>> {
+fn load_cookies<P: AsRef<Path>>(path: P) -> Result<Cookie, Error> {
     println!("[{}] Load cookie from: {:?}", *INFO_LABEL, path.as_ref());
-    let file = File::open(path).unwrap();
+    let file = File::open(path)?;
     let reader = BufReader::new(file);
     let mut cookies = Cookie::new();
 
     for line in reader.lines() {
-        let line = line.unwrap();
+        let line = line?;
         if let Some((key, value)) = line.split_once("=") {
             cookies.insert(key.trim().to_string(), value.trim().to_string());
+        } else {
+            return Err(Error::MalformedCookie(line));
         }
     }
 
@@ -272,7 +274,7 @@ mod tests {
     #[test]
     fn test_extract_url_number() {
         let url = "https://example.com/dashboard/problems/42";
-        assert_eq!(extract_url_number(url), "42".to_string());
+        assert_eq!(extract_url_number(url).unwrap(), "42".to_string());
     }
 
     #[test]

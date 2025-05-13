@@ -1,5 +1,3 @@
-use reqwest::Url;
-
 type SelectorParseError = Box<dyn std::error::Error>;
 
 #[derive(Debug, thiserror::Error)]
@@ -50,8 +48,13 @@ pub enum Error {
     #[error("")]
     FileNameMissing,
 
+    // todo: handle_errorを追加する
     #[error("")]
     FormatMismatch,
+
+    // todo: handle_errorを追加する
+    #[error("Malformed cookie: {0}")]
+    MalformedCookie(String),
 }
 
 pub fn handle_error(e: Error) {
