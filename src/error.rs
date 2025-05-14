@@ -5,16 +5,16 @@ pub enum Error {
     #[error("Seletor parse error: {0}")]
     Selector(#[from] SelectorParseError),
 
-    #[error("正規表現のコンパイルに失敗しました。: {0}")]
+    #[error("Failed to compile regex: {0}")]
     RegexCompile(#[from] regex::Error),
 
     #[error("Regex capture failed")]
     RegexCapture,
 
-    #[error("IO error: {0}")]
+    #[error("I/O error: {0}")]
     Io(#[from] std::io::Error),
 
-    #[error("内部エラーが発生しました。開発者に連絡して下さい。")]
+    #[error("An internal error has occured. Please contact the developer.")]
     Internal,
 
     #[error("Failed to determine cookie path")]
@@ -44,40 +44,31 @@ pub enum Error {
     #[error("Login failed: redirected to unexpected URL")]
     LoginFailed,
 
-    // todo: ユーザーに見せるべきかを検討する
-    #[error("")]
+    #[error("File name could not be determined")]
     FileNameMissing,
 
-    // todo: handle_errorを追加する
-    #[error("")]
+    #[error("Format does not match expected structure")]
     FormatMismatch,
 
-    // todo: handle_errorを追加する
     #[error("Malformed cookie: {0}")]
     MalformedCookie(String),
 
-    // todo: handle_errorを追加する
     #[error("Failed to get Cookie file path")]
     CookiePathUnvaliable,
 
-    // todo: handle_errorを追加する
-    #[error("Failed to get Cookie file path")]
+    #[error("No cookie file found")]
     NoCookie,
 
-    // todo: handle_errorを追加する
-    #[error("Failed to get Cookie file path")]
+    #[error("Cookie file is not valid UTF-8")]
     CookieNotUtf8,
 
-    // todo: handle_errorを追加する
-    #[error("")]
+    #[error("Standard input is unvaliable")]
     StdinUnavailable,
 
-    // todo: handle_errorを追加する
-    #[error("")]
+    #[error("Path is not valid UTF-8: {0:?}")]
     NonUtf8Path(std::path::PathBuf),
 
-    // todo: handle_errorを追加する
-    #[error("")]
+    #[error("Timed out while waiting for process")]
     WaitTimeoutFailed,
 }
 
@@ -137,6 +128,30 @@ pub fn handle_error(e: Error) {
         // todo: ユーザーに見せるべきかを検討する
         Error::FileNameMissing => {
             eprintln!("ファイル名の取得に失敗しました。")
+        }
+        Error::FormatMismatch => {
+            eprintln!("ファイルの形式が期待された構造と一致しません")
+        }
+        Error::MalformedCookie(s) => {
+            eprintln!("Cookieの形式が不正です: {}", s)
+        }
+        Error::CookiePathUnvaliable => {
+            eprintln!("Cookieファイルのパス取得に失敗しました。")
+        }
+        Error::NoCookie => {
+            eprintln!("Cookieファイルが見つかりませんでした。")
+        }
+        Error::CookieNotUtf8 => {
+            eprintln!("CookieファイルがUTF-8として正しく読み取れませんでした。")
+        }
+        Error::StdinUnavailable => {
+            eprintln!("標準入力が使用できません。")
+        }
+        Error::NonUtf8Path(path) => {
+            eprintln!("パスがUTF-8として正しくありません: {:?}", path)
+        }
+        Error::WaitTimeoutFailed => {
+            eprintln!("プロセスの終了を待機中にタイムアウトが発生しました。")
         }
         _ => {
             eprintln!("予期せぬエラーが発生しました。");
