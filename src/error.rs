@@ -71,6 +71,10 @@ pub enum Error {
     // todo: handle_errorを追加する
     #[error("")]
     StdinUnavailable,
+
+    // todo: handle_errorを追加する
+    #[error("")]
+    NonUtf8Path(std::path::PathBuf),
 }
 
 pub fn handle_error(e: Error) {

@@ -217,19 +217,22 @@ fn write_to_stdin(child: &mut Child, contents: &str) -> Result<(), Error> {
     Ok(())
 }
 
-fn create_testfile_list(path: &str) -> Vec<TestFile> {
-    let entries = fs::read_dir(path).unwrap();
+fn create_testfile_list(path: &str) -> Result<Vec<TestFile>, Error> {
+    let entries = fs::read_dir(path)?;
 
     let mut file_list = Vec::<String>::new();
     for entry in entries {
         let entry = entry.expect("error");
-        let path = entry.path().to_str().unwrap().to_string();
-        file_list.push(path);
+        let path_buf = entry.path();
+        let path = path_buf
+            .to_str()
+            .ok_or(Error::NonUtf8Path(path_buf.clone()))?;
+        file_list.push(path.to_string());
     }
 
     file_list.sort();
 
-    conv_string_to_testfiles(file_list)
+    Ok(conv_string_to_testfiles(file_list))
 }
 
 fn conv_string_to_testfiles(file_list: Vec<String>) -> Vec<TestFile> {
