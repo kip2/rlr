@@ -55,6 +55,10 @@ pub enum Error {
     // todo: handle_errorを追加する
     #[error("Malformed cookie: {0}")]
     MalformedCookie(String),
+
+    // todo: handle_errorを追加する
+    #[error("Failed to get Cookie file path")]
+    CookiePathUnvaliable,
 }
 
 pub fn handle_error(e: Error) {

@@ -141,13 +141,13 @@ fn fetch_problem_page(url: &str) -> Result<HTML, Error> {
     let jar = Arc::new(Jar::default());
     let client = create_client(Redirect::ON, &jar)?;
 
-    let cookie_path = get_cookie_path().unwrap();
+    let cookie_path = get_cookie_path().ok_or(Error::CookiePathUnvaliable)?;
 
-    let cookies = load_cookies(cookie_path).unwrap();
+    let cookies = load_cookies(cookie_path)?;
     let cookie_header = format_cookie_header(cookies);
 
     println!("[{}] GET: {}", *NETWORK_LABEL, url);
-    let res = get_page_with_cookie(&client, url, &cookie_header).unwrap();
+    let res = get_page_with_cookie(&client, url, &cookie_header)?;
 
     let final_url = res.url().as_str();
     if final_url != url {
@@ -204,8 +204,9 @@ fn get_page_with_cookie(
     client: &Client,
     url: &str,
     cookie_header: &str,
-) -> Result<Response, reqwest::Error> {
-    client.get(url).header("Cookie", cookie_header).send()
+) -> Result<Response, Error> {
+    let res = client.get(url).header("Cookie", cookie_header).send()?;
+    Ok(res)
 }
 
 fn extract_token_from_html(html: &str) -> Result<String, Error> {
@@ -273,7 +274,7 @@ mod tests {
 
     #[test]
     fn test_extract_url_number() {
-        let url = "https://example.com/dashboard/problems/42";
+        let url = "https://example.com/dashboard/pjroblems/42";
         assert_eq!(extract_url_number(url).unwrap(), "42".to_string());
     }
 
