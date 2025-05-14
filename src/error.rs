@@ -67,6 +67,10 @@ pub enum Error {
     // todo: handle_errorを追加する
     #[error("Failed to get Cookie file path")]
     CookieNotUtf8,
+
+    // todo: handle_errorを追加する
+    #[error("")]
+    StdinUnavailable,
 }
 
 pub fn handle_error(e: Error) {

@@ -1,3 +1,4 @@
+use crate::error::Error;
 use crate::file::{get_file_name, read_file};
 use crate::messages::*;
 use colored::Colorize;
@@ -210,9 +211,10 @@ fn trim_one_newline(s: &str) -> &str {
     }
 }
 
-fn write_to_stdin(child: &mut Child, contents: &str) {
-    let stdin = child.stdin.as_mut().unwrap();
-    stdin.write_all(contents.as_bytes()).unwrap();
+fn write_to_stdin(child: &mut Child, contents: &str) -> Result<(), Error> {
+    let stdin = child.stdin.as_mut().ok_or(Error::StdinUnavailable)?;
+    stdin.write_all(contents.as_bytes())?;
+    Ok(())
 }
 
 fn create_testfile_list(path: &str) -> Vec<TestFile> {
