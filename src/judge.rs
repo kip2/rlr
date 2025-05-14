@@ -2,6 +2,7 @@ use crate::error::Error;
 use crate::file::{get_file_name, read_file};
 use crate::messages::*;
 use colored::Colorize;
+use std::process::ExitStatus;
 use std::{
     fs::{self},
     io::Write,
@@ -50,9 +51,9 @@ impl JudgeResult {
     }
 }
 
-pub fn judge(command_str: &str) {
+pub fn judge(command_str: &str) -> Result<(), Error> {
     let dir_path = "./testcase";
-    let file_list = create_testfile_list(dir_path);
+    let file_list = create_testfile_list(dir_path)?;
     let version_info = format!("Recursion local runner {}", env!("CARGO_PKG_VERSION"));
     let mut slowest_elapsed_time = Duration::new(0, 0);
     let mut slowest_elapsed_case = String::new();
@@ -73,7 +74,7 @@ pub fn judge(command_str: &str) {
     for testfile in file_list {
         let input_file_path = testfile.input_file;
         let output_file_path = testfile.output_file;
-        let result = judge_test(&input_file_path, &output_file_path, command_str);
+        let result = judge_test(&input_file_path, &output_file_path, command_str)?;
 
         // increment success case count
         if result.is_success {
@@ -117,53 +118,41 @@ pub fn judge(command_str: &str) {
             *FAILURE_LABEL, *FAILED_LABEL, total_case
         );
     }
+
+    Ok(())
 }
 
-fn judge_test(input_path: &str, output_path: &str, command_str: &str) -> JudgeResult {
+fn judge_test(
+    input_path: &str,
+    output_path: &str,
+    command_str: &str,
+) -> Result<JudgeResult, Error> {
     let timeout = Duration::from_secs(3);
 
     // start time measurement
     let start = Instant::now();
 
-    let settion_title = get_file_name(input_path);
+    let settion_title = get_file_name(input_path)?;
 
     println!("[{}] {}", *INFO_LABEL, settion_title);
 
-    let input_contents = read_file(input_path);
-    let output_contents = read_file(output_path);
+    let input_contents = read_file(input_path)?;
+    let output_contents = read_file(output_path)?;
 
     let mut child = Command::new("sh")
         .arg("-c")
         .arg(command_str)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
-        .spawn()
-        .expect("Failed to execute on Unix-like system");
+        .spawn()?;
 
-    write_to_stdin(&mut child, &input_contents);
+    write_to_stdin(&mut child, &input_contents)?;
 
-    let wait_result = child.wait_timeout(timeout).unwrap();
+    let wait_result = child.wait_timeout(timeout)?;
 
     let mut actual = String::new();
 
-    let verdict = if wait_result.is_none() {
-        let _ = child.kill();
-        Verdict::TLE
-    } else {
-        let status = wait_result.unwrap();
-        if !status.success() {
-            Verdict::RE
-        } else {
-            let stdout = child.wait_with_output().unwrap();
-            actual = String::from_utf8_lossy(&stdout.stdout).to_string();
-            actual = trim_one_newline(&actual).to_string();
-            if actual.trim() == output_contents.trim() {
-                Verdict::AC
-            } else {
-                Verdict::WA
-            }
-        }
-    };
+    let verdict = determine_verdict(&mut child, wait_result, &output_contents, &mut actual)?;
 
     let duration = start.elapsed();
 
@@ -200,7 +189,40 @@ fn judge_test(input_path: &str, output_path: &str, command_str: &str) -> JudgeRe
     println!("---------------------------");
     println!();
 
-    JudgeResult::new(settion_title.to_string(), is_success, duration)
+    Ok(JudgeResult::new(
+        settion_title.to_string(),
+        is_success,
+        duration,
+    ))
+}
+
+fn determine_verdict(
+    child: &mut Child,
+    wait_result: Option<ExitStatus>,
+    expected_output: &str,
+    actual_output: &mut String,
+) -> Result<Verdict, Error> {
+    if wait_result.is_none() {
+        let _ = child.kill();
+        return Ok(Verdict::TLE);
+    }
+
+    let status = wait_result.ok_or(Error::WaitTimeoutFailed)?;
+
+    if !status.success() {
+        return Ok(Verdict::RE);
+    }
+
+    let output = child.wait_with_output()?;
+
+    *actual_output = String::from_utf8_lossy(&output.stdout).to_string();
+    *actual_output = trim_one_newline(actual_output).to_string();
+
+    if actual_output.trim() == expected_output.trim() {
+        Ok(Verdict::AC)
+    } else {
+        Ok(Verdict::WA)
+    }
 }
 
 fn trim_one_newline(s: &str) -> &str {
@@ -222,7 +244,7 @@ fn create_testfile_list(path: &str) -> Result<Vec<TestFile>, Error> {
 
     let mut file_list = Vec::<String>::new();
     for entry in entries {
-        let entry = entry.expect("error");
+        let entry = entry?;
         let path_buf = entry.path();
         let path = path_buf
             .to_str()

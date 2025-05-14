@@ -11,7 +11,7 @@ pub enum Error {
     #[error("Regex capture failed")]
     RegexCapture,
 
-    #[error("Fale save error: {0}")]
+    #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
 
     #[error("内部エラーが発生しました。開発者に連絡して下さい。")]
@@ -75,6 +75,10 @@ pub enum Error {
     // todo: handle_errorを追加する
     #[error("")]
     NonUtf8Path(std::path::PathBuf),
+
+    // todo: handle_errorを追加する
+    #[error("")]
+    WaitTimeoutFailed,
 }
 
 pub fn handle_error(e: Error) {
