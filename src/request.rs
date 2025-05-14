@@ -17,7 +17,7 @@ use reqwest::{
 use scraper::{Html, Selector};
 
 use crate::{
-    error::{Error, handle_error},
+    error::Error,
     file::save_to_file,
     messages::{FAILED_LABEL, INFO_LABEL, NETWORK_LABEL, SUCCESS_LABEL},
     parser::{get_test_cases, save_test_cases},
@@ -156,17 +156,18 @@ fn fetch_problem_page(url: &str) -> Result<HTML, Error> {
     println!("[{}] {}", *NETWORK_LABEL, res.status());
     println!();
 
-    let response_cookie = jar
-        .cookies(&Url::parse(url).unwrap())
-        .ok_or("No cookies")
-        .unwrap()
+    let url_parsed = Url::parse(url)?;
+
+    let cookie = jar.cookies(&url_parsed).ok_or(Error::NoCookie)?;
+
+    let response_cookie = cookie
         .to_str()
-        .unwrap()
+        .map_err(|_| Error::CookieNotUtf8)?
         .to_string();
 
-    save_cookie_to_file(response_cookie).unwrap();
+    save_cookie_to_file(response_cookie)?;
 
-    let body = res.text().unwrap();
+    let body = res.text()?;
     Ok(body)
 }
 
