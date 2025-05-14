@@ -87,25 +87,21 @@ pub fn initial_auth(email: &str, password: &str) -> Result<(), Error> {
     }
 }
 
-pub fn download(arg_s: &str) {
+pub fn download(arg_s: &str) -> Result<(), Error> {
     let url = if is_natural_number(arg_s) {
         create_url(arg_s)
     } else {
         arg_s.to_string()
     };
 
-    let html = fetch_problem_page(&url).unwrap();
+    let html = fetch_problem_page(&url)?;
 
-    let problem_id = extract_url_number(&url);
+    let problem_id = extract_url_number(&url)?;
 
-    match get_test_cases(&html) {
-        Ok(test_cases) => {
-            if let Err(e) = save_test_cases(test_cases, &problem_id) {
-                handle_error(e);
-            }
-        }
-        Err(e) => handle_error(e),
-    }
+    let test_cases = get_test_cases(&html)?;
+    save_test_cases(test_cases, &problem_id)?;
+
+    Ok(())
 }
 
 fn is_login_successful(location: &str) -> bool {
