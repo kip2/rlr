@@ -16,7 +16,16 @@ rlr(Recursion Local Runner)は、RecursionCSで公開されている問題を、
 - ローカルで実行できるので、RecusrionCSのエディタでサポートされていない言語でも問題を解くことが可能。
 
 また、ローカルで実行できるため、好きなエディタで編集、実行が可能となっています。
-(`vim`、`neovim`、`Emacs`、`VScode`, `Eclipse`, `IntelliJ`, `サクラエディタ`, `秀丸エディタ`, `メモ帳`, ...and more)
+- `vim`
+- `neovim`
+- `Emacs`
+- `VScode`
+- `Eclipse`
+- `IntelliJ`
+- `サクラエディタ`
+- `秀丸エディタ`
+- `メモ帳`
+and more...
 
 ## Install
 
