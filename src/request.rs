@@ -70,14 +70,22 @@ pub fn initial_auth(email: &str, password: &str) -> Result<(), Error> {
     let location = res
         .headers()
         .get(LOCATION)
-        .ok_or(Error::HeaderMissing)?
-        .to_str()?;
+        .ok_or(Error::HeaderMissing(
+            "Location header missing in initial_auth".to_string(),
+        ))?
+        .to_str()
+        .map_err(|_| {
+            Error::Internal("Failed to parse Location header as UTF-8 in initial_auth".to_string())
+        })?;
 
     if is_login_successful(location) {
         println!("[{}] Login sucess.", *SUCCESS_LABEL);
-        let url = Url::parse("https://recursionist.io")?;
+        let url = Url::parse("https://recursionist.io").map_err(|_| Error::UrlIncorrectFormat)?;
         let cookies = jar.cookies(&url).ok_or(Error::CookieMissing)?;
-        let cookie_str = cookies.to_str()?.to_string();
+        let cookie_str = cookies
+            .to_str()
+            .map_err(|_| Error::CookieNotUtf8)?
+            .to_string();
 
         save_cookie_to_file(cookie_str)?;
         Ok(())
@@ -108,12 +116,12 @@ fn is_login_successful(location: &str) -> bool {
     location == "https://recursionist.io/dashboard"
 }
 
-fn get_cookie_path() -> Option<std::path::PathBuf> {
+fn get_cookie_path() -> Result<std::path::PathBuf, Error> {
     if let Some(project_dir) = ProjectDirs::from("Recursion", "tool", "rlr") {
         let config_dir = project_dir.config_dir();
-        Some(config_dir.join("cookie.jar"))
+        Ok(config_dir.join("cookie.jar"))
     } else {
-        None
+        Err(Error::CookiePathUnvaliable)
     }
 }
 
@@ -127,9 +135,13 @@ fn is_natural_number(s: &str) -> bool {
 }
 
 fn extract_url_number(url: &str) -> Result<String, Error> {
-    let re = Regex::new(r"/problems/(\d+)$")?;
-    let caps = re.captures(url).ok_or(Error::FormatMismatch)?;
-    let matched = caps.get(1).ok_or(Error::FormatMismatch)?;
+    let re = Regex::new(r"/problems/(\d+)$")
+        .map_err(|_| Error::Internal("Regex compile error in extract_url_number".to_string()))?;
+    let caps = re.captures(url).ok_or(Error::UrlIncorrectFormat)?;
+    let matched = caps.get(1).ok_or(Error::Internal(format!(
+        "Capture group not found in extract_url_number for URL: {}",
+        url
+    )))?;
     Ok(matched.as_str().to_string())
 }
 
@@ -137,7 +149,7 @@ fn fetch_problem_page(url: &str) -> Result<HTML, Error> {
     let jar = Arc::new(Jar::default());
     let client = create_client(Redirect::ON, &jar)?;
 
-    let cookie_path = get_cookie_path().ok_or(Error::CookiePathUnvaliable)?;
+    let cookie_path = get_cookie_path()?;
 
     let cookies = load_cookies(cookie_path)?;
     let cookie_header = format_cookie_header(cookies);
@@ -156,7 +168,7 @@ fn fetch_problem_page(url: &str) -> Result<HTML, Error> {
     println!("[{}] {}", *NETWORK_LABEL, res.status());
     println!();
 
-    let url_parsed = Url::parse(url)?;
+    let url_parsed = Url::parse(url).map_err(|_| Error::UrlIncorrectFormat)?;
 
     let cookie = jar.cookies(&url_parsed).ok_or(Error::NoCookie)?;
 
@@ -172,7 +184,7 @@ fn fetch_problem_page(url: &str) -> Result<HTML, Error> {
 }
 
 fn save_cookie_to_file(cookie: String) -> Result<(), Error> {
-    let cookie_path = get_cookie_path().ok_or(Error::CookiePathMissing)?;
+    let cookie_path = get_cookie_path()?;
     save_to_file(&cookie_path, &cookie)?;
     println!("[{}] Save cookie to: {:?}", *INFO_LABEL, cookie_path);
     Ok(())
@@ -208,13 +220,17 @@ fn get_page_with_cookie(
 
 fn extract_token_from_html(html: &str) -> Result<String, Error> {
     let doc = Html::parse_document(html);
-    let selector = Selector::parse(r#"input[name="_token"]"#).map_err(|_| Error::TokenNotFound)?;
+    let selector = Selector::parse(r#"input[name="_token"]"#).map_err(|_| {
+        Error::TokenNotFound("Token parse error in extract_token_from_html".to_string())
+    })?;
     let token = doc
         .select(&selector)
         .next()
         .and_then(|e| e.value().attr("value").map(|v| v.to_string()))
         .map(|v| v.to_string())
-        .ok_or(Error::TokenNotFound)?;
+        .ok_or(Error::TokenNotFound(
+            "Token parse error in extract_token_from_html".to_string(),
+        ))?;
 
     Ok(token)
 }

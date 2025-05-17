@@ -28,5 +28,7 @@ pub fn get_file_name(file_path: &str) -> Result<&str, Error> {
     Path::new(file_path)
         .file_stem()
         .and_then(|s| s.to_str())
-        .ok_or(Error::FileNameMissing)
+        .ok_or(Error::Internal(
+            "Failed to get file name in get_file_name".to_string(),
+        ))
 }

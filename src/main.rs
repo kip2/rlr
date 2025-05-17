@@ -115,7 +115,8 @@ fn prompt_email(prompt: &str) -> Result<String, Error> {
 }
 
 fn valid_email(email: &str) -> Result<bool, Error> {
-    let re = Regex::new(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")?;
+    let re = Regex::new(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+        .map_err(|_| Error::Internal("Regex compile error in valid_email".to_string()))?;
 
     Ok(re.is_match(email))
 }

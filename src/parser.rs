@@ -108,15 +108,12 @@ fn pickup_test_case(html: &str) -> Result<Vec<String>, Error> {
 }
 
 fn parse_input_case(test_case: &str) -> Result<String, Error> {
-    let re = match Regex::new(r"\(([^)]+)\)") {
-        Ok(re) => re,
-        Err(e) => {
-            log::error!("正規表現の構文エラー: {}", e);
-            return Err(Error::Internal);
-        }
-    };
+    let re = Regex::new(r"\(([^)]+)\)")
+        .map_err(|_| Error::Internal("Regex compile error in parse_input_case".to_string()))?;
 
-    let cap = re.captures(&test_case).ok_or(Error::RegexCapture)?;
+    let cap = re.captures(&test_case).ok_or(Error::Internal(
+        "Regex capture error in parse_input_case".to_string(),
+    ))?;
     let inside = &cap[1];
     let result = inside
         .split(",")
@@ -128,9 +125,12 @@ fn parse_input_case(test_case: &str) -> Result<String, Error> {
 }
 
 fn parse_output_case(test_case: &str) -> Result<String, Error> {
-    let re = Regex::new(r"--> (.+)$")?;
+    let re = Regex::new(r"--> (.+)$")
+        .map_err(|_| Error::Internal("Regex compili error in parse_output_case".to_string()))?;
 
-    let cap = re.captures(&test_case).ok_or(Error::RegexCapture)?;
+    let cap = re.captures(&test_case).ok_or(Error::Internal(
+        "Regex capture error in parse_output_case".to_string(),
+    ))?;
     let result = cap[1].to_string();
     Ok(result)
 }

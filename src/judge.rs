@@ -152,7 +152,7 @@ fn judge_test(
 
     let mut actual = String::new();
 
-    let verdict = determine_verdict(&mut child, wait_result, &output_contents, &mut actual)?;
+    let verdict = determine_verdict(child, wait_result, &output_contents, &mut actual)?;
 
     let duration = start.elapsed();
 
@@ -197,17 +197,17 @@ fn judge_test(
 }
 
 fn determine_verdict(
-    child: &mut Child,
+    mut child: Child,
     wait_result: Option<ExitStatus>,
     expected_output: &str,
     actual_output: &mut String,
 ) -> Result<Verdict, Error> {
-    if wait_result.is_none() {
+    let status = if let Some(status) = wait_result {
+        status
+    } else {
         let _ = child.kill();
         return Ok(Verdict::TLE);
-    }
-
-    let status = wait_result.ok_or(Error::WaitTimeoutFailed)?;
+    };
 
     if !status.success() {
         return Ok(Verdict::RE);
@@ -234,7 +234,9 @@ fn trim_one_newline(s: &str) -> &str {
 }
 
 fn write_to_stdin(child: &mut Child, contents: &str) -> Result<(), Error> {
-    let stdin = child.stdin.as_mut().ok_or(Error::StdinUnavailable)?;
+    let stdin = child.stdin.as_mut().ok_or(Error::Internal(
+        "Failed to stdin in write_to_stdin".to_string(),
+    ))?;
     stdin.write_all(contents.as_bytes())?;
     Ok(())
 }
@@ -246,9 +248,9 @@ fn create_testfile_list(path: &str) -> Result<Vec<TestFile>, Error> {
     for entry in entries {
         let entry = entry?;
         let path_buf = entry.path();
-        let path = path_buf
-            .to_str()
-            .ok_or(Error::NonUtf8Path(path_buf.clone()))?;
+        let path = path_buf.to_str().ok_or(Error::Internal(
+            "Path is not valid UTF-8 in create_testfile_list".to_string(),
+        ))?;
         file_list.push(path.to_string());
     }
 
