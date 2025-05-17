@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-TAG="v0.1.0"
+TAG="v$(grep '^version =' Cargo.toml | sed -E 's/version = \"(.*)\"/\1/')"
 REPO="kip2/rlr"
 BINARY="rlr"
 TARGET="x86_64-unknown-linux-gnu"
