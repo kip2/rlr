@@ -1337,6 +1337,7 @@ dependencies = [
  "thiserror",
  "url",
  "wait-timeout",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]

@@ -6,6 +6,7 @@ use clap::Subcommand;
 use error::Error;
 use error::handle_error;
 use judge::judge;
+use messages::enable_ansi_support;
 use regex::Regex;
 use request::download;
 use request::initial_auth;
@@ -66,6 +67,9 @@ struct DownloadArgs {
 }
 
 fn main() {
+    #[cfg(windows)]
+    enable_ansi_support();
+
     if let Err(e) = run() {
         handle_error(e);
     }
