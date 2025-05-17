@@ -1,3 +1,5 @@
+use crate::messages::ERROR_LABEL;
+
 type SelectorParseError = Box<dyn std::error::Error>;
 
 #[derive(Debug, thiserror::Error)]
@@ -38,61 +40,66 @@ pub enum Error {
     #[error("Cookie file is not valid UTF-8")]
     CookieNotUtf8,
 
-    #[error("")]
+    #[error("Incrrect url format")]
     UrlIncorrectFormat,
+}
+
+macro_rules! errorln {
+    ($($arg:tt)*) => {
+        eprintln!("[{}] {}", *ERROR_LABEL, format!($($arg)*) );
+    };
 }
 
 pub fn handle_error(e: Error) {
     match e {
         Error::Selector(err) => {
-            eprintln!(
+            errorln!(
                 "テストケースの取得に失敗しました。ログインに失敗しているか、指定したURLが正しくない可能性があります: {}",
-                err
-            )
+                err,
+            );
         }
         Error::Io(err) => {
-            eprintln!("I/O処理でエラーが発生しました: {}", err)
+            errorln!("I/O処理でエラーが発生しました: {}", err);
         }
         Error::Internal(err) => {
-            eprintln!("内部エラーが発生しました。\nError: {}", err);
+            errorln!("内部エラーが発生しました。\nError: {}", err);
         }
         Error::CookiePathUnvaliable => {
-            eprintln!("Cookieファイルのパス取得に失敗しました。")
+            errorln!("Cookieファイルのパス取得に失敗しました。");
         }
         Error::Network(err) => {
-            eprintln!("ネットワークエラーが発生しました。{}", err);
+            errorln!("ネットワークエラーが発生しました。{}", err);
         }
         Error::CookieMissing => {
-            eprintln!("Cookieが見つかりません。再度ログインをして下さい");
+            errorln!("Cookieが見つかりません。再度ログインをして下さい");
         }
         Error::HeaderMissing(err) => {
-            eprintln!(
-                "ログイン処理に失敗しました。もう一度やり直すか、開発者にお問い合わせ下さい。\nError: {}",
-                err
-            )
+            errorln!(
+                "ログイン処理に失敗しました。もう一度やり直すか、開発者にお問い合わせ下さい。"
+            );
+            errorln!("Error: {}", err);
         }
         Error::TokenNotFound(err) => {
-            eprintln!(
-                "ログイン処理に失敗しました。もう一度やり直すか、開発者にお問い合わせ下さい。\nError: {}",
-                err
-            )
+            errorln!(
+                "ログイン処理に失敗しました。もう一度やり直すか、開発者にお問い合わせ下さい。"
+            );
+            errorln!("Error: {}", err);
         }
         Error::LoginFailed => {
-            eprintln!("ログインに失敗しました。メールアドレスやパスワードをご確認下さい。")
+            errorln!("ログインに失敗しました。メールアドレスやパスワードをご確認下さい。");
         }
         Error::MalformedCookie(s) => {
-            eprintln!("Cookieの形式が不正です: {}", s)
+            errorln!("Cookieの形式が不正です: {}", s);
         }
         Error::NoCookie => {
-            eprintln!("ログイン状態の確認に失敗しました。もう一度ログインして下さい。")
+            errorln!("ログイン状態の確認に失敗しました。もう一度ログインして下さい。");
         }
         Error::CookieNotUtf8 => {
-            eprintln!("CookieファイルがUTF-8として正しく読み取れませんでした。")
+            errorln!("CookieファイルがUTF-8として正しく読み取れませんでした。");
         }
         Error::UrlIncorrectFormat => {
-            eprintln!(
-                "URLの形式が正しくありません。正しい形式で入力して下さい。\nExample: https://recursionist.io/dashboard/problems/1"
-            )
+            errorln!("URLの形式が正しくありません。正しい形式で入力して下さい。");
+            errorln!("Example: https://recursionist.io/dashboard/problems/1");
         }
     }
 }
