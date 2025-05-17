@@ -90,7 +90,7 @@ fn login() -> Result<(), Error> {
     let password =
         rpassword::prompt_password("Password: ").expect("パスワードの入力処理に失敗しました");
 
-    initial_auth(&email, &password);
+    initial_auth(&email, &password)?;
     Ok(())
 }
 

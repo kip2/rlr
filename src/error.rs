@@ -106,8 +106,5 @@ pub fn handle_error(e: Error) {
                 "URLの形式が正しくありません。正しい形式で入力して下さい。\nExample: https://recursionist.io/dashboard/problems/1"
             )
         }
-        _ => {
-            eprintln!("予期せぬエラーが発生しました。");
-        }
     }
 }
