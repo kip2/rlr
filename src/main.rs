@@ -68,7 +68,6 @@ struct DownloadArgs {
 fn main() {
     if let Err(e) = run() {
         handle_error(e);
-        std::process::exit(1);
     }
 }
 

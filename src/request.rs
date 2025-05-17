@@ -123,29 +123,6 @@ fn valid_problem_url(url: &str) -> Result<bool, Error> {
     Ok(re.is_match(url.trim()))
 }
 
-#[test]
-fn test_valid_problem_url() {
-    let url = "https://recursionist.io/dashboard/problems/1";
-
-    assert!(valid_problem_url(url).unwrap());
-
-    let url = "https://recursionist.io/dashboard/problems/1000";
-
-    assert!(valid_problem_url(url).unwrap());
-
-    let url = "https://example.com/dashboard/problems/1";
-
-    assert!(!valid_problem_url(url).unwrap());
-
-    let url = "123https://recursionist.io/dashboard/problems/1";
-
-    assert!(!valid_problem_url(url).unwrap());
-
-    let url = "https://recursionist.io/dashboard/problems/100.000";
-
-    assert!(!valid_problem_url(url).unwrap());
-}
-
 fn is_login_successful(location: &str) -> bool {
     location == "https://recursionist.io/dashboard"
 }
@@ -368,5 +345,28 @@ mod tests {
         let wrong_location = "https://recursionist.io/";
 
         assert!(!is_login_successful(wrong_location));
+    }
+
+    #[test]
+    fn test_valid_problem_url() {
+        let url = "https://recursionist.io/dashboard/problems/1";
+
+        assert!(valid_problem_url(url).unwrap());
+
+        let url = "https://recursionist.io/dashboard/problems/1000";
+
+        assert!(valid_problem_url(url).unwrap());
+
+        let url = "https://example.com/dashboard/problems/1";
+
+        assert!(!valid_problem_url(url).unwrap());
+
+        let url = "123https://recursionist.io/dashboard/problems/1";
+
+        assert!(!valid_problem_url(url).unwrap());
+
+        let url = "https://recursionist.io/dashboard/problems/100.000";
+
+        assert!(!valid_problem_url(url).unwrap());
     }
 }
