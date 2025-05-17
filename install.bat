@@ -1,7 +1,13 @@
 @echo off
 setlocal
 
-set TAG=v0.1.0
+:: Cargo.tomlからversionを抽出
+for /f "tokens=2 delims== " %%v in ('findstr /b /c:"version =" Cargo.toml') do (
+    set "TAG=%%~v"
+)
+set "TAG=%TAG:"=%"
+set "TAG=v%TAG: =%"
+
 set REPO=kip2/rlr
 set FILE=rlr-x86_64-pc-windows-msvc.zip
 set INSTALL_DIR=%USERPROFILE%\rlr-bin
