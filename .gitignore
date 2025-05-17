@@ -53,3 +53,5 @@ testcase/
 calc_temperature
 tests/
 update-tag.sh
+
+template
