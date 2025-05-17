@@ -1,6 +1,6 @@
 use std::{
     collections::HashMap,
-    fs::File,
+    fs::{self, File},
     io::{BufRead, BufReader},
     path::Path,
     sync::Arc,
@@ -112,6 +112,53 @@ pub fn download(arg_s: &str) -> Result<(), Error> {
 
     let test_cases = get_test_cases(&html)?;
     save_test_cases(test_cases, &problem_id)?;
+
+    let path = format!("./problem-{}", problem_id);
+    move_files_template(&path)?;
+
+    Ok(())
+}
+
+fn move_files_template(dest_dir: &str) -> Result<(), Error> {
+    let dir_name = "template";
+    let template_path = Path::new(dir_name);
+    let dest_path = Path::new(dest_dir);
+
+    if template_path.is_dir() && dest_path.exists() {
+        copy_all_files_recursive(template_path, dest_path)?;
+    }
+
+    Ok(())
+}
+
+fn copy_all_files_recursive(src: &Path, dest: &Path) -> Result<(), Error> {
+    if !dest.exists() {
+        fs::create_dir_all(dest)
+            .map_err(|_| Error::Internal("Failed to create directory".to_string()))?;
+    }
+
+    for entry in
+        fs::read_dir(src).map_err(|_| Error::Internal("Failed to read directory".to_string()))?
+    {
+        let entry =
+            entry.map_err(|_| Error::Internal("Failed to get directory entry".to_string()))?;
+        let path = entry.path();
+        let relative_path = path
+            .strip_prefix(src)
+            .map_err(|_| Error::Internal("Failed to get relative path".to_string()))?;
+        let new_path = dest.join(relative_path);
+
+        if path.is_dir() {
+            copy_all_files_recursive(&path, &new_path)?;
+        } else if path.is_file() {
+            if let Some(parent) = new_path.parent() {
+                fs::create_dir_all(parent)
+                    .map_err(|_| Error::Internal("Failed to create paret direcotry".to_string()))?;
+            }
+            fs::copy(&path, &new_path)
+                .map_err(|_| Error::Internal("Failed to copy file".to_string()))?;
+        }
+    }
 
     Ok(())
 }
