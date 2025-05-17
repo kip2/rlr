@@ -42,6 +42,8 @@ target
 .scala-build
 #-----------------
 
+.vscode
+
 todos.md
 
 test-html/
@@ -53,5 +55,5 @@ testcase/
 calc_temperature
 tests/
 update-tag.sh
-
-template
+count-line.sh
+problem-2
