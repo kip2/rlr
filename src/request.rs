@@ -102,6 +102,10 @@ pub fn download(arg_s: &str) -> Result<(), Error> {
         arg_s.to_string()
     };
 
+    if !valid_problem_url(&url)? {
+        return Err(Error::UrlIncorrectFormat);
+    }
+
     let html = fetch_problem_page(&url)?;
 
     let problem_id = extract_url_number(&url)?;
@@ -110,6 +114,36 @@ pub fn download(arg_s: &str) -> Result<(), Error> {
     save_test_cases(test_cases, &problem_id)?;
 
     Ok(())
+}
+
+fn valid_problem_url(url: &str) -> Result<bool, Error> {
+    let re = Regex::new(r"^https://recursionist.io/dashboard/problems/\d+$")
+        .map_err(|_| Error::Internal("Regex compile error in valid_email".to_string()))?;
+
+    Ok(re.is_match(url.trim()))
+}
+
+#[test]
+fn test_valid_problem_url() {
+    let url = "https://recursionist.io/dashboard/problems/1";
+
+    assert!(valid_problem_url(url).unwrap());
+
+    let url = "https://recursionist.io/dashboard/problems/1000";
+
+    assert!(valid_problem_url(url).unwrap());
+
+    let url = "https://example.com/dashboard/problems/1";
+
+    assert!(!valid_problem_url(url).unwrap());
+
+    let url = "123https://recursionist.io/dashboard/problems/1";
+
+    assert!(!valid_problem_url(url).unwrap());
+
+    let url = "https://recursionist.io/dashboard/problems/100.000";
+
+    assert!(!valid_problem_url(url).unwrap());
 }
 
 fn is_login_successful(location: &str) -> bool {
