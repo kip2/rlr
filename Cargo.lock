@@ -1335,6 +1335,7 @@ dependencies = [
  "rpassword",
  "scraper",
  "thiserror",
+ "url",
  "wait-timeout",
 ]
 

@@ -3,6 +3,8 @@ use std::io::Write;
 
 use clap::Parser;
 use clap::Subcommand;
+use error::Error;
+use error::handle_error;
 use judge::judge;
 use regex::Regex;
 use request::download;
@@ -64,42 +66,59 @@ struct DownloadArgs {
 }
 
 fn main() {
-    let cli = Cli::parse();
-
-    match cli.command {
-        Commands::Download(args) => download(&args.url),
-        Commands::Judge(args) => judge(&args.judge_command),
-        Commands::Login => run_login(),
+    if let Err(e) = run() {
+        handle_error(e);
+        std::process::exit(1);
     }
 }
 
-fn run_login() {
-    let email = prompt_email("Emailアドレス: ");
+fn run() -> Result<(), Error> {
+    let cli = Cli::parse();
 
-    let password = rpassword::prompt_password("Password: ").unwrap();
+    match cli.command {
+        Commands::Download(args) => download(&args.url)?,
+        Commands::Judge(args) => judge(&args.judge_command)?,
+        Commands::Login => login()?,
+    }
 
-    initial_auth(&email, &password);
+    Ok(())
 }
 
-fn prompt_email(prompt: &str) -> String {
+fn login() -> Result<(), Error> {
+    let email = prompt_email("Emailアドレス: ")?;
+
+    let password =
+        rpassword::prompt_password("Password: ").expect("パスワードの入力処理に失敗しました");
+
+    initial_auth(&email, &password);
+    Ok(())
+}
+
+fn prompt_email(prompt: &str) -> Result<String, Error> {
     loop {
         let mut email = String::new();
         print!("{}", prompt);
-        io::stdout().flush().unwrap();
-        io::stdin().read_line(&mut email).unwrap();
-        let email = email.trim().to_string();
+        io::stdout().flush()?;
+        if let Err(e) = io::stdin().read_line(&mut email) {
+            eprintln!("入力に失敗しました: {}", e);
+            continue;
+        }
 
-        if valid_email(&email) {
-            return email;
+        let email = email.trim();
+
+        if valid_email(email)? {
+            return Ok(email.to_string());
         }
 
         println!("Emailの形式で入力して下さい。");
     }
 }
 
-fn valid_email(email: &str) -> bool {
-    let re = Regex::new(r"^[^@\s]+@[^@\s]+\.[^@\s]+$").unwrap();
-    re.is_match(email)
+fn valid_email(email: &str) -> Result<bool, Error> {
+    let re = Regex::new(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+        .map_err(|_| Error::Internal("Regex compile error in valid_email".to_string()))?;
+
+    Ok(re.is_match(email))
 }
 
 #[cfg(test)]
@@ -110,12 +129,12 @@ mod tests {
     fn test_valid_email() {
         let email = "email@example.com";
 
-        assert!(valid_email(email));
+        assert!(valid_email(email).unwrap());
     }
 
     #[test]
     fn test_valid_email_with_wrong_email() {
         let wrong_email = "email.example.com";
-        assert!(!valid_email(wrong_email));
+        assert!(!valid_email(wrong_email).unwrap());
     }
 }
