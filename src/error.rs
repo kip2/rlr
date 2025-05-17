@@ -8,11 +8,8 @@ pub enum Error {
     #[error("I/O error: {0}")]
     Io(#[from] std::io::Error),
 
-    #[error("An internal error has occured.\nPlease contact the developer.\nError:({0})")]
+    #[error("An internal error has occured.\nError: {0})")]
     Internal(String),
-
-    #[error("Redirected to unexpected URL: expected {expected}, got {actual}")]
-    Unexpectedredirect { expected: String, actual: String },
 
     #[error("Failed to get Cookie file path")]
     CookiePathUnvaliable,
@@ -57,22 +54,13 @@ pub fn handle_error(e: Error) {
             eprintln!("I/O処理でエラーが発生しました: {}", err)
         }
         Error::Internal(err) => {
-            eprintln!(
-                "内部エラーが発生しました。開発者に連絡して下さい。\nError: {}",
-                err
-            );
+            eprintln!("内部エラーが発生しました。\nError: {}", err);
         }
         Error::CookiePathUnvaliable => {
             eprintln!("Cookieファイルのパス取得に失敗しました。")
         }
         Error::Network(err) => {
             eprintln!("ネットワークエラーが発生しました。{}", err);
-        }
-        Error::Unexpectedredirect { expected, actual } => {
-            eprintln!(
-                "ページの取得に失敗しました(ページが予期しない場所にリダイレクトされました)。もう一度お試し下さい。\nexpected: {}\nactual: {}",
-                expected, actual
-            )
         }
         Error::CookieMissing => {
             eprintln!("Cookieが見つかりません。再度ログインをして下さい");

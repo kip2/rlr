@@ -159,10 +159,9 @@ fn fetch_problem_page(url: &str) -> Result<HTML, Error> {
 
     let final_url = res.url().as_str();
     if final_url != url {
-        return Err(Error::Unexpectedredirect {
-            expected: url.to_string(),
-            actual: final_url.to_string(),
-        });
+        return Err(Error::Internal(
+            "Unexpected redirect in fetch_problem_page".to_string(),
+        ));
     }
 
     println!("[{}] {}", *NETWORK_LABEL, res.status());
