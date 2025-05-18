@@ -79,7 +79,7 @@ pub fn initial_auth(email: &str, password: &str) -> Result<(), Error> {
         })?;
 
     if is_login_successful(location) {
-        println!("[{}] Login sucess.", *SUCCESS_LABEL);
+        println!("[{}] Login success.", *SUCCESS_LABEL);
         let url = Url::parse("https://recursionist.io").map_err(|_| Error::UrlIncorrectFormat)?;
         let cookies = jar.cookies(&url).ok_or(Error::CookieMissing)?;
         let cookie_str = cookies
