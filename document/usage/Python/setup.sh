@@ -17,10 +17,3 @@ if [ -d "$DIRECTORY_NAME" ]; then
 fi
 
 rlr d "https://recursionist.io/dashboard/problems/${PROBLEM_NUMBER}"
-
-
-# copy template file
-cp ./template/main.py "$DIRECTORY_NAME/main.py"
-
-# copy shell script to execute judge
-cp ./template/run.sh "$DIRECTORY_NAME/"
