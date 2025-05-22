@@ -56,4 +56,4 @@ calc_temperature
 tests/
 update-tag.sh
 count-line.sh
-problem-2
+problem-*
