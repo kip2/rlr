@@ -45,6 +45,9 @@ pub enum Error {
 
     #[error("Authentication failed")]
     AuthenticationError,
+
+    #[error("Cookie file not found")]
+    CookieNotFound,
 }
 
 macro_rules! errorln {
@@ -107,6 +110,9 @@ pub fn handle_error(e: Error) {
         }
         Error::AuthenticationError => {
             errorln!("認証に失敗しました。ログインし直して下さい。");
+        }
+        Error::CookieNotFound => {
+            errorln!("Cookieファイルが見つかりませんでした。");
         }
     }
 }
