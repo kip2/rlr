@@ -42,6 +42,9 @@ pub enum Error {
 
     #[error("Incrrect url format")]
     UrlIncorrectFormat,
+
+    #[error("Authentication failed")]
+    AuthenticationError,
 }
 
 macro_rules! errorln {
@@ -62,7 +65,8 @@ pub fn handle_error(e: Error) {
             errorln!("I/O処理でエラーが発生しました: {}", err);
         }
         Error::Internal(err) => {
-            errorln!("内部エラーが発生しました。\nError: {}", err);
+            errorln!("内部エラーが発生しました。");
+            errorln!("{}", err);
         }
         Error::CookiePathUnvaliable => {
             errorln!("Cookieファイルのパス取得に失敗しました。");
@@ -100,6 +104,9 @@ pub fn handle_error(e: Error) {
         Error::UrlIncorrectFormat => {
             errorln!("URLの形式が正しくありません。正しい形式で入力して下さい。");
             errorln!("Example: https://recursionist.io/dashboard/problems/1");
+        }
+        Error::AuthenticationError => {
+            errorln!("認証に失敗しました。ログインし直して下さい。");
         }
     }
 }
