@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-TAG="v$(grep '^version =' Cargo.toml | sed -E 's/version = \"(.*)\"/\1/')"
 REPO="kip2/rlr"
 BINARY="rlr"
 TARGET="x86_64-unknown-linux-gnu"
@@ -11,7 +10,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
 fi
 
 FILE="${BINARY}-${TARGET}.tar.gz"
-URL="https://github.com/${REPO}/releases/download/${TAG}/${FILE}"
+URL="https://github.com/${REPO}/releases/latest/download/${FILE}"
 
 INSTALL_DIR="$HOME/.local/bin"
 mkdir -p "$INSTALL_DIR"
