@@ -6,7 +6,6 @@ use std::{
     sync::Arc,
 };
 
-use directories::ProjectDirs;
 use regex::Regex;
 use reqwest::{
     Url,
@@ -18,7 +17,7 @@ use scraper::{Html, Selector};
 
 use crate::{
     error::Error,
-    file::save_to_file,
+    file::{get_cookie_path, save_to_file},
     messages::{FAILED_LABEL, INFO_LABEL, NETWORK_LABEL, SUCCESS_LABEL},
     parser::{get_test_cases, save_test_cases},
 };
@@ -172,15 +171,6 @@ fn valid_problem_url(url: &str) -> Result<bool, Error> {
 
 fn is_login_successful(location: &str) -> bool {
     location == "https://recursionist.io/dashboard"
-}
-
-fn get_cookie_path() -> Result<std::path::PathBuf, Error> {
-    if let Some(project_dir) = ProjectDirs::from("Recursion", "tool", "rlr") {
-        let config_dir = project_dir.config_dir();
-        Ok(config_dir.join("cookie.jar"))
-    } else {
-        Err(Error::CookiePathUnvaliable)
-    }
 }
 
 fn create_url(num_str: &str) -> String {

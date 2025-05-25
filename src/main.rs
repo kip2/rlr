@@ -5,6 +5,7 @@ use clap::Parser;
 use clap::Subcommand;
 use error::Error;
 use error::handle_error;
+use file::cookie_path;
 use judge::judge;
 use regex::Regex;
 use request::download;
@@ -53,6 +54,9 @@ enum Commands {
         about = "カレントディレクトリにあるtestcaseディレクトリに対して、指定されたコマンドを使用してテストを実行します"
     )]
     Judge(JudgeArgs),
+
+    #[command(about = "Cookieファイルの保存パスを取得します。")]
+    CookiePath,
 }
 
 #[derive(Parser)]
@@ -84,6 +88,7 @@ fn run() -> Result<(), Error> {
         Commands::Download(args) => download(&args.url)?,
         Commands::Judge(args) => judge(&args.judge_command)?,
         Commands::Login => login()?,
+        Commands::CookiePath => cookie_path()?,
     }
 
     Ok(())

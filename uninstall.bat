@@ -4,6 +4,19 @@ setlocal
 set INSTALL_DIR=%USERPROFILE%\rlr-bin
 set BINARY_NAME=rlr.exe
 
+for /f "usebackq delims=" %%p in (`powershell -nologo -noprofile -command "try { & '%INSTALL_DIR%\%BINARY_NAME%' cookie-path } catch { exit 1 }"`) do (
+    set "COOKIE_PATH=%%p"
+)
+
+if defined COOKIE_PATH (
+    if exist "%COOKIE_PATH%" (
+        echo Deleting "%COOKIE_PATH%"
+        del "%COOKIE_PATH%"
+    )
+) else (
+    echo Failed to retrieve cookie path
+)
+
 if exist "%INSTALL_DIR%\%BINARY_NAME%" (
     echo Deleting %INSTALL_DIR%\%BINARY_NAME%
     del "%INSTALL_DIR%\%BINARY_NAME%"
