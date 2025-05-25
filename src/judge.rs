@@ -74,7 +74,7 @@ pub fn judge(command_str: &str) -> Result<(), Error> {
     for testfile in file_list {
         let input_file_path = testfile.input_file;
         let output_file_path = testfile.output_file;
-        let result = judge_test(&input_file_path, &output_file_path, command_str)?;
+        let result = judge_test_case(&input_file_path, &output_file_path, command_str)?;
 
         // increment success case count
         if result.is_success {
@@ -122,7 +122,7 @@ pub fn judge(command_str: &str) -> Result<(), Error> {
     Ok(())
 }
 
-fn judge_test(
+fn judge_test_case(
     input_path: &str,
     output_path: &str,
     command_str: &str,
@@ -167,10 +167,10 @@ fn judge_test(
         Verdict::WA => {
             println!("[{}] time: {:.6} sec", *INFO_LABEL, duration.as_secs_f64());
             println!("[{}] {}", *FAILURE_LABEL, *WA_LABEL);
-            println!("input:\n {}", input_contents);
-            println!("output:\n {}", actual);
+            println!("input:\n{}", input_contents);
+            println!("output:\n{}", actual);
             println!();
-            println!("expected:\n {}", output_contents);
+            println!("expected:\n{}", output_contents);
         }
         Verdict::RE => {
             println!("[{}] {}", *FAILURE_LABEL, *RE_LABEL);
