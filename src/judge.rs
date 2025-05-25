@@ -167,10 +167,10 @@ fn judge_test(
         Verdict::WA => {
             println!("[{}] time: {:.6} sec", *INFO_LABEL, duration.as_secs_f64());
             println!("[{}] {}", *FAILURE_LABEL, *WA_LABEL);
-            println!("input:\n {}", input_contents);
-            println!("output:\n {}", actual);
+            println!("input:\n{}", input_contents);
+            println!("output:\n{}", actual);
             println!();
-            println!("expected:\n {}", output_contents);
+            println!("expected:\n{}", output_contents);
         }
         Verdict::RE => {
             println!("[{}] {}", *FAILURE_LABEL, *RE_LABEL);
