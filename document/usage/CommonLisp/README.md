@@ -30,9 +30,9 @@ chmod +x setup.sh
 実行すると、以下のようにディレクトリが準備されます。
 
 ```sh
-$ tree problem-1 
+$ tree p-1 
 
-problem-1
+p-1
 ├── main.lsp # <- ここを編集する
 ├── run.sh
 └── testcase
@@ -60,7 +60,7 @@ problem-1
 
 ```sh
 # ディレクトリを移動
-cd problem-1
+cd p-1
 
 # 実行権限を与える
 chmod +x run.sh

@@ -8,7 +8,7 @@ if [ $# -ne 1 ]; then
 fi
 
 PROBLEM_NUMBER=$1
-DIRECTORY_SUFFIX="problem-"
+DIRECTORY_SUFFIX="p-"
 DIRECTORY_NAME="${DIRECTORY_SUFFIX}${PROBLEM_NUMBER}"
 
 if [ -d "$DIRECTORY_NAME" ]; then

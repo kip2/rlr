@@ -112,7 +112,7 @@ pub fn download(arg_s: &str) -> Result<(), Error> {
     let test_cases = get_test_cases(&html)?;
     save_test_cases(test_cases, &problem_id)?;
 
-    let path = format!("./problem-{}", problem_id);
+    let path = format!("./p-{}", problem_id);
     move_files_template(&path)?;
 
     Ok(())

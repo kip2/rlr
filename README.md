@@ -168,10 +168,10 @@ rlr download "https://recursionist.io/dashboard/problems/1"
 rlr d "https://recursionist.io/dashboard/problems/1"
 ```
 
-ダウンロードされると、`problem-問題番号`の名前でディレクトリを作成し、その中にテストケースを記載したファイルの`testcase`ディレクトリが作成されます。
+ダウンロードされると、`p-問題番号`の名前でディレクトリを作成し、その中にテストケースを記載したファイルの`testcase`ディレクトリが作成されます。
 
 ```sh
-└── problem-1
+└── p-1
     └── testcase
         ├── testcase-1.in
         ├── testcase-1.out
@@ -201,10 +201,10 @@ rlr d "https://recursionist.io/dashboard/problems/1"
 
 問題を解くコードを記載したら、テストケースを用いてジャッジを行います。
 
-ジャッジを実行するには、ダウンロードしたテストケース(`problem-1`)が存在するディレクトリで、`judge`コマンドを使用する必要があります。
+ジャッジを実行するには、ダウンロードしたテストケース(`p-1`)が存在するディレクトリで、`judge`コマンドを使用する必要があります。
 
 ```sh
-└── problem-1   # <- このディレクトリに移動して実行する。
+└── p-1   # <- このディレクトリに移動して実行する。
     └── testcase
         ├── testcase-1.in
         ├── testcase-1.out
@@ -218,11 +218,11 @@ rlr d "https://recursionist.io/dashboard/problems/1"
         └── testcase-5.out
 ```
 
-具体的には、`problem-1`ディレクトリに移動してから`judge`コマンドを実行すると良いでしょう。
+具体的には、`p-1`ディレクトリに移動してから`judge`コマンドを実行すると良いでしょう。
 
 ```sh
-# problem-1の例
-cd problem-1
+# p-1の例
+cd p-1
 ```
 
 `judege`コマンドは以下のような構造になっています。
