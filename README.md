@@ -27,6 +27,7 @@ rlr(Recursion Local Runner)は、RecursionCSで公開されている問題を、
 - `サクラエディタ`
 - `秀丸エディタ`
 - `メモ帳`
+
 and more...
 
 ## Install
@@ -41,6 +42,16 @@ and more...
 2. インストールの実行
 
 ##### ファイルの取得(Windows/Mac/Linux共通)
+
+ファイルの取得は2つの方法があります。
+
+###### リリースページよりダウンロードする
+
+[リリースページ](https://github.com/kip2/rlr/releases)の最新のリリースから、ダウンロードして下さい。
+
+Linux/Macなら`install.sh`を、Windowsなら`install.bat`をダウンロードして下さい。
+
+###### リポジトリをクローンする
 
 Gitリポジトリをクローン、もしくは`zip`でダウンロードして下さい。
 
@@ -62,7 +73,7 @@ git clone https://github.com/kip2/rlr.git
 
 ##### Mac/Linuxの場合
 
-実行権限を与えて、`install.sh`を実行して下さい。
+ダウンロードした`install.sh`に実行権限を与え、実行して下さい。
 
 ```sh
 # 実行権限の付与
