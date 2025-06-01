@@ -60,6 +60,9 @@ jobs:
             tar -czvf "dist/${archive_name}" -C dist "${binary_base}"
           fi
 
+          cp install.sh dist/ 2>/dev/null || true
+          cp install.bat dist/ 2>/dev/null || true
+
       - name: Upload release asset
         uses: softprops/action-gh-release@v1
         with:
