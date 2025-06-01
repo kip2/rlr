@@ -66,5 +66,7 @@ jobs:
           files: |
             dist/*.tar.gz
             dist/*.zip
+            dist/install.sh
+            dist/install.bat
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
